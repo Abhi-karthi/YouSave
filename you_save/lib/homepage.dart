@@ -16,7 +16,7 @@ class MyHomePage extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              Row(),
               Text(
                 'YOU SAVE',
                 style: TextStyle(
@@ -35,11 +35,11 @@ class MyHomePage extends StatelessWidget {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 90),
               Image.asset(
                 'lib/heart_without_bg.png',
-                width: 200,
-                height: 200,
+                width: 400,
+                height: 400,
                 // fit: ContentMode.contain,
               ),
             ],
