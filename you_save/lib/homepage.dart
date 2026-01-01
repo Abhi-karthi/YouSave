@@ -16,7 +16,17 @@ class MyHomePage extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              Row(),
+              Row(
+                children: [
+                  SizedBox(width: 15.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      print('pressed');
+                    },
+                    child: Icon(Icons.menu, size: 24.0),
+                  ),
+                ],
+              ),
               Text(
                 'YOU SAVE',
                 style: TextStyle(
@@ -36,11 +46,17 @@ class MyHomePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 90),
-              Image.asset(
-                'lib/heart_without_bg.png',
-                width: 400,
-                height: 400,
-                // fit: ContentMode.contain,
+
+              InkWell(
+                onTap: () {
+                  print('Image tapped');
+                },
+                child: Image.asset(
+                  'lib/heart_without_bg.png',
+                  width: 400,
+                  height: 400,
+                  // fit: ContentMode.contain,
+                ),
               ),
             ],
           ),
