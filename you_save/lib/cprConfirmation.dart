@@ -79,7 +79,13 @@ class Call911 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        print('Call 911 pressed');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Color.fromARGB(255, 255, 61, 61),
         foregroundColor: Colors.white,

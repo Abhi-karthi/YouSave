@@ -1,13 +1,22 @@
 import 'dart:ui';
 
-import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
 import 'main.dart';
 import 'select_age.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool _isPressed = false;
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -46,20 +55,39 @@ class MyHomePage extends StatelessWidget {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 90),
+              const SizedBox(height: 115),
 
               GestureDetector(
-                onTap: () {
+                onTapDown: (_) => setState(() => _isPressed = true),
+                onTapUp: (_) {
+                  setState(() => _isPressed = false);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SelectAgePage()),
                   );
                 },
-                child: Image.asset(
-                  'lib/assets/heart_without_bg.png',
-                  width: 400,
-                  height: 400,
-                  // fit: ContentMode.contain,
+                onTapCancel: () => setState(() => _isPressed = false),
+                child: AnimatedScale(
+                  scale: _isPressed ? 0.92 : 1.0, // Shrinks to 92% size
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeOutCubic,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Your heart shape code
+                      const Icon(
+                        Icons.favorite,
+                        color: Color.fromARGB(255, 255, 61, 61),
+                        size: 350,
+                      ),
+                      // Your ECG Painter code
+                      SizedBox(
+                        width: 100,
+                        height: 170,
+                        child: CustomPaint(painter: ECGLinesPainter()),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -68,4 +96,43 @@ class MyHomePage extends StatelessWidget {
       ),
     );
   }
+}
+
+class ECGLinesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors
+          .white // White line to contrast with your red heart
+      ..strokeWidth = 7
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+    double w = size.width;
+    double h = size.height;
+    double mid = h / 2;
+
+    // Starting Baseline
+    path.moveTo(0, mid);
+    // path.lineTo(w * 0.1, mid);
+
+    // P-Wave (Small bump)
+
+    // QRS Complex (The big sharp spike)
+    path.lineTo(w * 0.23, mid); // Q (small dip)
+    path.lineTo(w * 0.3, mid - h * 0.3); // R (big peak)
+    path.lineTo(w * 0.35, mid + h * 0.2); // S (dip below baseline)
+    path.lineTo(w * 0.43, mid);
+
+    // T-Wave (Medium bump)
+
+    // Ending Baseline
+    path.lineTo(w, mid);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
