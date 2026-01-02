@@ -22,7 +22,3 @@ flutter:
   uses-material-design: true
 
   assets:
-    - lib/assets/heart_without_bg.png # Replace with your actual filename
-    - lib/assets/Adult-age-selection.png
-    - lib/assets/Child-age-selection.png
-    - lib/assets/Infant-age-selection.png
