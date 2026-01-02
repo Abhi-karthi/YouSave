@@ -48,9 +48,23 @@ class StartCPR extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        print('Start CPR pressed');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color.fromARGB(255, 255, 61, 61),
+        foregroundColor: Colors.white,
+        fixedSize: const Size(350, 115),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+      ),
       child: Text(
-        appState.currentAge,
+        'Start CPR',
         style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
       ),
     );
@@ -69,9 +83,13 @@ class Call911 extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: Color.fromARGB(255, 255, 61, 61),
         foregroundColor: Colors.white,
+        fixedSize: const Size(350, 115),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(14.0),
         child: Column(
           children: [
             Text(
@@ -81,7 +99,7 @@ class Call911 extends StatelessWidget {
             SizedBox(height: 5),
             Text(
               'If you are alone, call now. Otherwise, tell someone else to.',
-              style: TextStyle(fontSize: 8.0),
+              style: TextStyle(fontSize: 12.0),
             ),
           ],
         ),
