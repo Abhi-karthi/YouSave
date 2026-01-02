@@ -56,7 +56,7 @@ class MyHomePage extends StatelessWidget {
                   );
                 },
                 child: Image.asset(
-                  'lib/heart_without_bg.png',
+                  'lib/assets/heart_without_bg.png',
                   width: 400,
                   height: 400,
                   // fit: ContentMode.contain,

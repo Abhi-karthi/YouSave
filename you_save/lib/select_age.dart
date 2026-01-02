@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'main.dart';
 import 'homepage.dart';
+import 'cprConfirmation.dart';
 
 class SelectAgePage extends StatelessWidget {
   const SelectAgePage({super.key});
@@ -24,49 +25,55 @@ class SelectAgePage extends StatelessWidget {
                 appState.setCurrentAge('Adult');
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SelectAgePage()),
+                  MaterialPageRoute(
+                    builder: (context) => CPRConfirmationPage(),
+                  ),
                 );
 
                 print(appState.currentAge);
               },
               child: Image.asset(
-                'lib/Adult-age-selection.png',
-                width: 250,
-                height: 250,
+                'lib/assets/Adult-age-selection.png',
+                width: 150,
+                height: 150,
                 // fit: ContentMode.contain,
               ),
             ),
-            SizedBox(height: 40),
+            SizedBox(height: 60),
             GestureDetector(
               onTap: () {
                 appState.setCurrentAge('Child');
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SelectAgePage()),
+                  MaterialPageRoute(
+                    builder: (context) => CPRConfirmationPage(),
+                  ),
                 );
                 print('Child');
               },
               child: Image.asset(
-                'lib/Child-age-selection.png',
-                width: 250,
-                height: 250,
+                'lib/assets/Child-age-selection.png',
+                width: 150,
+                height: 150,
                 // fit: ContentMode.contain,
               ),
             ),
-            SizedBox(height: 40),
+            SizedBox(height: 60),
             GestureDetector(
               onTap: () {
                 appState.setCurrentAge('Infant');
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SelectAgePage()),
+                  MaterialPageRoute(
+                    builder: (context) => CPRConfirmationPage(),
+                  ),
                 );
                 print('Infant');
               },
               child: Image.asset(
-                'lib/Infant-age-selection.png',
-                width: 250,
-                height: 250,
+                'lib/assets/Infant-age-selection.png',
+                width: 150,
+                height: 150,
                 // fit: ContentMode.contain,
               ),
             ),
