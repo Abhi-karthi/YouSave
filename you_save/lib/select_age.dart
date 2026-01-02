@@ -24,24 +24,7 @@ class SelectAgePage extends StatelessWidget {
             SizedBox(height: 60),
             ChildElevatedButton(),
             SizedBox(height: 60),
-            GestureDetector(
-              onTap: () {
-                appState.setCurrentAge('Infant');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CPRConfirmationPage(),
-                  ),
-                );
-                print('Infant');
-              },
-              child: Image.asset(
-                'lib/assets/Infant-age-selection.png',
-                width: 150,
-                height: 150,
-                // fit: ContentMode.contain,
-              ),
-            ),
+            InfantElevatedButton(),
           ],
         ),
       ),
