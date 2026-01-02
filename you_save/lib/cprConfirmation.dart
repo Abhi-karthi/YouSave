@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'main.dart';
 import 'homepage.dart';
 import 'select_age.dart';
+import 'cprChecklist.dart';
 
 class CPRConfirmationPage extends StatelessWidget {
   const CPRConfirmationPage({super.key});
@@ -15,13 +16,13 @@ class CPRConfirmationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     return Scaffold(
-      appBar: AppBar(title: Text('CPR Confirmation:')),
+      appBar: AppBar(title: Text('CPR Confirmation')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${appState.currentAge}:',
+              appState.currentAge,
               style: TextStyle(
                 fontSize: 42.0,
                 fontWeight: FontWeight.bold,
@@ -52,7 +53,7 @@ class StartCPR extends StatelessWidget {
         print('Start CPR pressed');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+          MaterialPageRoute(builder: (context) => CPRChecklist()),
         );
       },
       style: ElevatedButton.styleFrom(
