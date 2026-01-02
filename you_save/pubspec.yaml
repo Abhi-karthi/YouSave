@@ -22,3 +22,6 @@ flutter:
 
   assets:
     - lib/heart_without_bg.png # Replace with your actual filename
+    - lib/Adult-age-selection.png
+    - lib/Child-age-selection.png
+    - lib/Infant-age-selection.png

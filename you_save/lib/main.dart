@@ -27,4 +27,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {}
+class MyAppState extends ChangeNotifier {
+  var currentAge = '';
+
+  void setCurrentAge(String age) {
+    currentAge = age;
+    notifyListeners();
+  }
+}

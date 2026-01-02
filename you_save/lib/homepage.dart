@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'main.dart';
+import 'select_age.dart';
 
 class MyHomePage extends StatelessWidget {
   @override
@@ -47,9 +48,12 @@ class MyHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 90),
 
-              InkWell(
+              GestureDetector(
                 onTap: () {
-                  print('Image tapped');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SelectAgePage()),
+                  );
                 },
                 child: Image.asset(
                   'lib/heart_without_bg.png',
