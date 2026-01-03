@@ -8,14 +8,41 @@ import 'main.dart';
 import 'homepage.dart';
 import 'select_age.dart';
 import 'cprConfirmation.dart';
+import 'package:flutter/material.dart';
 
-class CPRChecklist extends StatelessWidget {
-  const CPRChecklist({super.key});
+class CPRChecklist extends StatefulWidget {
+  @override
+  // ignore: library_private_types_in_public_api
+  _CPRChecklistState createState() => _CPRChecklistState();
+}
+
+class _CPRChecklistState extends State<CPRChecklist> {
+  var checklist = [];
+  var pre_cpr_checklist = [false, false, false];
 
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var checklist = [];
+    if (appState.currentAge == 'Adult') {
+      checklist = [
+        'Confirm it is Cardiac Arrest (Tap & Shout, Check Breathing, Check Pulse)',
+        'Depth of compression is 2 inches (5 cm)',
+        'Heel of one hand on center of chest, other hand on top',
+      ];
+    } else if (appState.currentAge == 'Child') {
+      checklist = [
+        'Confirm it is Cardiac Arrest (Tap & Shout, Check Breathing, Check Pulse)',
+        'Depth of compression is about 2 inches (5 cm)',
+        'Use one or two hands on center of chest',
+      ];
+    } else if (appState.currentAge == 'Infant') {
+      checklist = [
+        'Confirm it is Cardiac Arrest (Tap & Shout, Check Breathing, Check Pulse)',
+        'Depth of compression is about 1.5 inches (4 cm)',
+        'Use two fingers in center of chest just below nipple line',
+      ];
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('CPR Checklist')),
       body: Center(
@@ -30,12 +57,57 @@ class CPRChecklist extends StatelessWidget {
                 color: Color.fromARGB(255, 253, 75, 75),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 15),
             FirstBox(),
+            SizedBox(height: 20),
+            Text(
+              'Pre-CPR Checklist',
+              style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                pre_cpr_checklist[0] = true;
+                bool all = true;
+                for (int i = 0; i < pre_cpr_checklist.length; i++) {
+                  if (pre_cpr_checklist[i] == false) {
+                    all = false;
+                  }
+                }
+                if (all) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CPRConfirmationPage(),
+                    ),
+                  );
+                }
+              },
+              child: Row(
+                children: [
+                  FirstCheckBox(),
+                  SizedBox(width: 10),
+                  Text(checklist[0]),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+}
+
+class FirstCheckBox extends StatelessWidget {
+  const FirstCheckBox({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    if (appState.pre_cpr_checklist[0]) {
+      return Icon(Icons.check_box);
+    }
+    return Icon(Icons.check_box_outline_blank);
   }
 }
 
@@ -44,33 +116,62 @@ class FirstBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Color.fromARGB(255, 255, 177, 177),
-      padding: EdgeInsets.all(20.0), // Add some padding inside the container
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.phone, size: 11.0),
-              SizedBox(width: 5.0),
-              Text(
-                'Ensure someone is calling 911',
-                style: TextStyle(fontSize: 10.0),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(Icons.favorite, size: 11.0),
-              SizedBox(width: 5.0),
-              Text(
-                'Ensure someone is getting an AED',
-                style: TextStyle(fontSize: 10.0),
-              ),
-            ],
-          ),
-        ],
+    return PhysicalModel(
+      // This is the background color of the box
+      color: const Color.fromARGB(255, 255, 210, 210),
+      // Elevation adds the shadow automatically
+      elevation: 5,
+      shadowColor: Colors.black.withOpacity(0.2),
+      // This is what rounds the corners of the PhysicalModel itself
+      borderRadius: BorderRadius.circular(25),
+      // This forces the children (the Rows/Text) to be clipped to the rounded shape
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        width: 300,
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Row 1: 911 Instruction
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.phone, size: 18.0, color: Color(0xFFE53935)),
+                const SizedBox(width: 12.0),
+                const Text(
+                  'Ensure someone is calling 911',
+                  style: TextStyle(
+                    fontSize: 13.0,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFE53935),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10), // Spacing between the two rows
+            // Row 2: AED Instruction
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.favorite,
+                  size: 18.0,
+                  color: Color(0xFFE53935),
+                ),
+                const SizedBox(width: 12.0),
+                const Text(
+                  'Ensure someone is getting an AED',
+                  style: TextStyle(
+                    fontSize: 13.0,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFE53935),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

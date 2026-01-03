@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 115),
+              const SizedBox(height: 150),
 
               GestureDetector(
                 onTapDown: (_) => setState(() => _isPressed = true),
