@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 150),
+              const SizedBox(height: 170),
 
               GestureDetector(
                 onTapDown: (_) => setState(() => _isPressed = true),
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       // Your ECG Painter code
                       SizedBox(
-                        width: 100,
+                        width: 93,
                         height: 170,
                         child: CustomPaint(painter: ECGLinesPainter()),
                       ),
@@ -114,21 +114,21 @@ class ECGLinesPainter extends CustomPainter {
     double mid = h / 2;
 
     // Starting Baseline
-    path.moveTo(0, mid);
+    path.moveTo(w * 0.1, mid);
     // path.lineTo(w * 0.1, mid);
 
     // P-Wave (Small bump)
 
     // QRS Complex (The big sharp spike)
-    path.lineTo(w * 0.23, mid); // Q (small dip)
-    path.lineTo(w * 0.3, mid - h * 0.3); // R (big peak)
-    path.lineTo(w * 0.35, mid + h * 0.2); // S (dip below baseline)
-    path.lineTo(w * 0.43, mid);
+    path.lineTo(w * 0.37, mid); // Q (small dip)
+    path.lineTo(w * 0.47, mid - h * 0.3); // R (big peak)
+    path.lineTo(w * 0.52, mid + h * 0.2); // S (dip below baseline)
+    path.lineTo(w * 0.63, mid);
 
     // T-Wave (Medium bump)
 
     // Ending Baseline
-    path.lineTo(w, mid);
+    path.lineTo(w * 0.9, mid);
 
     canvas.drawPath(path, paint);
   }

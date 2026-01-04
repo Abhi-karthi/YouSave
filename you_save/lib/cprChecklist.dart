@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:english_words/english_words.dart';
 import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -57,40 +58,92 @@ class _CPRChecklistState extends State<CPRChecklist> {
                 color: Color.fromARGB(255, 253, 75, 75),
               ),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 35),
             FirstBox(),
-            SizedBox(height: 20),
+            SizedBox(height: 35),
             Text(
               'Pre-CPR Checklist',
               style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                pre_cpr_checklist[0] = true;
-                bool all = true;
-                for (int i = 0; i < pre_cpr_checklist.length; i++) {
-                  if (pre_cpr_checklist[i] == false) {
-                    all = false;
-                  }
-                }
-                if (all) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CPRConfirmationPage(),
-                    ),
-                  );
-                }
+            // SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  pre_cpr_checklist[0] = !pre_cpr_checklist[0];
+                });
               },
-              child: Row(
-                children: [
-                  FirstCheckBox(),
-                  SizedBox(width: 10),
-                  Text(checklist[0]),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Row(
+                  children: [
+                    FirstCheckBox(isChecked: pre_cpr_checklist[0]),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        checklist[0],
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  pre_cpr_checklist[1] = !pre_cpr_checklist[1];
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Row(
+                  children: [
+                    FirstCheckBox(isChecked: pre_cpr_checklist[1]),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        checklist[1],
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  pre_cpr_checklist[2] = !pre_cpr_checklist[2];
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Row(
+                  children: [
+                    FirstCheckBox(isChecked: pre_cpr_checklist[2]),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        checklist[2],
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 170),
+            StartCPRButton(checklist: pre_cpr_checklist),
+            SizedBox(height: 50),
           ],
         ),
       ),
@@ -98,16 +151,90 @@ class _CPRChecklistState extends State<CPRChecklist> {
   }
 }
 
-class FirstCheckBox extends StatelessWidget {
-  const FirstCheckBox({super.key});
+class StartCPRButton extends StatefulWidget {
+  final List<bool> checklist;
+  const StartCPRButton({super.key, required this.checklist});
 
   @override
+  State<StartCPRButton> createState() => _StartCPRButtonState();
+}
+
+class _StartCPRButtonState extends State<StartCPRButton> {
+  @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    if (appState.pre_cpr_checklist[0]) {
-      return Icon(Icons.check_box);
+    bool allChecked = true;
+    for (int i = 0; i < 3; i++) {
+      if (!widget.checklist[i]) {
+        allChecked = false;
+      }
     }
-    return Icon(Icons.check_box_outline_blank);
+    if (allChecked) {
+      return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Color(0xFFE53935),
+          side: BorderSide(color: Color(0xFFE53935), width: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Start CPR',
+            style: TextStyle(
+              fontSize: 30.0,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFE53935),
+            ),
+          ),
+        ),
+      );
+    }
+    return ElevatedButton(
+      onPressed: null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.grey,
+        foregroundColor: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Start CPR',
+          style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+}
+
+class FirstCheckBox extends StatefulWidget {
+  final bool isChecked;
+  const FirstCheckBox({super.key, required this.isChecked});
+
+  @override
+  State<FirstCheckBox> createState() => _FirstCheckBoxState();
+}
+
+class _FirstCheckBoxState extends State<FirstCheckBox> {
+  @override
+  Widget build(BuildContext context) {
+    bool all = true;
+    for (int i = 0; i < 3; i++) {
+      if (!widget.isChecked) {
+        all = false;
+      }
+    }
+    if (widget.isChecked) {
+      return Icon(Icons.check_box, color: Color(0xFFE53935));
+    }
+    return Icon(Icons.check_box_outline_blank, color: Color(0xFFE53935));
   }
 }
 
