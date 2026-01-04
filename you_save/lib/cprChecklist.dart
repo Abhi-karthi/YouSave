@@ -58,14 +58,14 @@ class _CPRChecklistState extends State<CPRChecklist> {
                 color: Color.fromARGB(255, 253, 75, 75),
               ),
             ),
-            SizedBox(height: 35),
+            SizedBox(height: 24),
             FirstBox(),
-            SizedBox(height: 35),
+            SizedBox(height: 24),
             Text(
               'Pre-CPR Checklist',
               style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
             ),
-            // SizedBox(height: 10),
+            SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -73,7 +73,10 @@ class _CPRChecklistState extends State<CPRChecklist> {
                 });
               },
               child: Padding(
-                padding: const EdgeInsets.all(18.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10.0,
+                ),
                 child: Row(
                   children: [
                     FirstCheckBox(isChecked: pre_cpr_checklist[0]),
@@ -98,7 +101,10 @@ class _CPRChecklistState extends State<CPRChecklist> {
                 });
               },
               child: Padding(
-                padding: const EdgeInsets.all(18.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10.0,
+                ),
                 child: Row(
                   children: [
                     FirstCheckBox(isChecked: pre_cpr_checklist[1]),
@@ -123,7 +129,10 @@ class _CPRChecklistState extends State<CPRChecklist> {
                 });
               },
               child: Padding(
-                padding: const EdgeInsets.all(18.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10.0,
+                ),
                 child: Row(
                   children: [
                     FirstCheckBox(isChecked: pre_cpr_checklist[2]),
@@ -141,9 +150,9 @@ class _CPRChecklistState extends State<CPRChecklist> {
                 ),
               ),
             ),
-            SizedBox(height: 170),
+            SizedBox(height: 210),
             StartCPRButton(checklist: pre_cpr_checklist),
-            SizedBox(height: 50),
+            SizedBox(height: 90),
           ],
         ),
       ),
@@ -171,11 +180,11 @@ class _StartCPRButtonState extends State<StartCPRButton> {
     if (allChecked) {
       return ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Color(0xFFE53935),
-          side: BorderSide(color: Color(0xFFE53935), width: 2),
+          backgroundColor: Color.fromARGB(255, 255, 70, 67),
+          foregroundColor: Colors.white,
+
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0),
+            borderRadius: BorderRadius.circular(10.0),
           ),
         ),
         onPressed: () {
@@ -185,13 +194,13 @@ class _StartCPRButtonState extends State<StartCPRButton> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 96.0, vertical: 12.0),
           child: Text(
-            'Start CPR',
+            'Begin CPR',
             style: TextStyle(
-              fontSize: 30.0,
+              fontSize: 24.0,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFE53935),
+              color: Color.fromARGB(255, 255, 255, 255),
             ),
           ),
         ),
@@ -202,12 +211,15 @@ class _StartCPRButtonState extends State<StartCPRButton> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.grey,
         foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 96.0, vertical: 12.0),
         child: Text(
-          'Start CPR',
-          style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+          'Begin CPR',
+          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
         ),
       ),
     );
