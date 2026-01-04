@@ -67,27 +67,39 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                 },
                 onTapCancel: () => setState(() => _isPressed = false),
-                child: AnimatedScale(
-                  scale: _isPressed ? 0.92 : 1.0, // Shrinks to 92% size
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOutCubic,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Your heart shape code
-                      const Icon(
-                        Icons.favorite,
-                        color: Color.fromARGB(255, 255, 61, 61),
-                        size: 350,
+                child: Column(
+                  children: [
+                    AnimatedScale(
+                      scale: _isPressed ? 0.92 : 1.0, // Shrinks to 92% size
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeOutCubic,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Your heart shape code
+                          const Icon(
+                            Icons.favorite,
+                            color: Color.fromARGB(255, 239, 59, 59),
+                            size: 350,
+                          ),
+                          // Your ECG Painter code
+                          SizedBox(
+                            width: 93,
+                            height: 170,
+                            child: CustomPaint(painter: ECGLinesPainter()),
+                          ),
+                        ],
                       ),
-                      // Your ECG Painter code
-                      SizedBox(
-                        width: 93,
-                        height: 170,
-                        child: CustomPaint(painter: ECGLinesPainter()),
+                    ),
+                    Text(
+                      'CARDIAC ARREST',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 237, 66, 66),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],

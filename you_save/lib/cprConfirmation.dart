@@ -29,11 +29,11 @@ class CPRConfirmationPage extends StatelessWidget {
                 color: Color.fromARGB(255, 253, 75, 75),
               ),
             ),
-            SizedBox(height: 180),
+            SizedBox(height: 190),
             Call911(appState: appState),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             StartCPR(appState: appState),
-            SizedBox(height: 275),
+            SizedBox(height: 285),
           ],
         ),
       ),
@@ -59,14 +59,16 @@ class StartCPR extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: Color.fromARGB(255, 255, 61, 61),
         foregroundColor: Colors.white,
-        fixedSize: const Size(350, 115),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
       ),
-      child: Text(
-        'Start CPR',
-        style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 93.0, vertical: 20.0),
+        child: Text(
+          'Start CPR',
+          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
