@@ -10,6 +10,7 @@ import 'homepage.dart';
 import 'select_age.dart';
 import 'cprConfirmation.dart';
 import 'package:flutter/material.dart';
+import 'cprPage.dart';
 
 class CPRChecklist extends StatefulWidget {
   @override
@@ -190,7 +191,7 @@ class _StartCPRButtonState extends State<StartCPRButton> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+            MaterialPageRoute(builder: (context) => CPRPage()),
           );
         },
         child: Padding(

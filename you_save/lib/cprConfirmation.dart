@@ -8,6 +8,7 @@ import 'main.dart';
 import 'homepage.dart';
 import 'select_age.dart';
 import 'cprChecklist.dart';
+import 'call911.dart';
 
 class CPRConfirmationPage extends StatelessWidget {
   const CPRConfirmationPage({super.key});
@@ -86,7 +87,9 @@ class Call911 extends StatelessWidget {
         print('Call 911 pressed');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+          MaterialPageRoute(
+            builder: (context) => Call911Page(appState: MyAppState()),
+          ),
         );
       },
       style: ElevatedButton.styleFrom(
