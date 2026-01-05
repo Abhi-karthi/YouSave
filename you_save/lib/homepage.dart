@@ -30,6 +30,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   SizedBox(width: 15.0),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(10.0),
+                      backgroundColor: Color.fromARGB(
+                        255,
+                        255,
+                        71,
+                        71,
+                      ), // Light red background
+                      foregroundColor: Colors.white, // White icon color
+                      elevation: 0, // No shadow
+                    ),
                     onPressed: () {
                       print('pressed');
                     },
