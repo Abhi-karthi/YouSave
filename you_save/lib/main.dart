@@ -32,6 +32,6 @@ class MyAppState extends ChangeNotifier {
 
   void setCurrentAge(String age) {
     currentAge = age;
-    notifyListeners();
+    notifyListeners(); // cool
   }
 }
