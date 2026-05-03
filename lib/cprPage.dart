@@ -172,16 +172,11 @@ class _CPRPageState extends State<CPRPage> {
                 ),
                 SizedBox(width: 20),
                 RestartButton(
-                  rounds: round,
-                  beats: beats,
-                  totalBeats: totalBeats,
+                  reset: _resetCounts,
                 ),
               ],
             ),
             SizedBox(height: 30,),
-            Text(
-              'Done', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 75)
-            )
           ],
         ),
       ),
@@ -189,47 +184,17 @@ class _CPRPageState extends State<CPRPage> {
   }
 }
 
-class RestartButton extends StatefulWidget {
-  final int rounds;
-  final int beats;
-  final int totalBeats;
+class RestartButton extends StatelessWidget {
+  final VoidCallback reset;
   const RestartButton({
     super.key,
-    required this.rounds,
-    required this.beats,
-    required this.totalBeats,
+    required this.reset,
   });
-
-  @override
-  State<RestartButton> createState() => _RestartButtonState();
-}
-
-class _RestartButtonState extends State<RestartButton> {
-  late int localRounds;
-  late int localBeats;
-  late int localTotalBeats;
-
-  @override
-  void initState() {
-    super.initState();
-    localRounds = widget.rounds;
-    localBeats = widget.beats;
-    localTotalBeats = widget.totalBeats;
-  }
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        setState(() {
-          localRounds = 1;
-          localBeats = 0;
-          localTotalBeats = 0;
-        });
-        print(
-          "Reset to Round: $localRounds, Beats: $localBeats, Total Beats: $localTotalBeats",
-        );
-      },
+      onPressed: reset,
       style: ElevatedButton.styleFrom(
         backgroundColor: Color.fromARGB(255, 242, 232, 232),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -256,6 +221,57 @@ class _RestartButtonState extends State<RestartButton> {
     );
   }
 }
+
+// class RestartButton extends StatefulWidget {
+//   final VoidCallback reset;
+//   const RestartButton({
+//     super.key,
+//     required this.reset,
+//   });
+//
+//   @override
+//   State<RestartButton> createState() => _RestartButtonState();
+// }
+//
+// class _RestartButtonState extends State<RestartButton> {
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ElevatedButton(
+//       onPressed: () {
+//         setState(() {
+//           reset();
+//         });
+//         print(
+//           "Reset to Round: $localRounds, Beats: $localBeats, Total Beats: $localTotalBeats",
+//         );
+//       },
+//       style: ElevatedButton.styleFrom(
+//         backgroundColor: Color.fromARGB(255, 242, 232, 232),
+//         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+//       ),
+//       child: Row(
+//         children: [
+//           Icon(
+//             Icons.restart_alt,
+//             size: 18,
+//             color: const Color.fromARGB(255, 0, 0, 0),
+//           ),
+//           SizedBox(width: 4),
+//           Text(
+//             "Reset",
+//             style: TextStyle(
+//               fontSize: 14,
+//               fontWeight: FontWeight.bold,
+//               color: const Color.fromARGB(255, 0, 0, 0),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class PauseButton extends StatelessWidget {
   final bool isCounting; // The information

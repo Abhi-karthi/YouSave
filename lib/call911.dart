@@ -59,12 +59,23 @@ class Call911Page extends StatelessWidget {
                 width: double.infinity,
                 height: 80,
                 child: ElevatedButton.icon(
-                  onPressed: _launchCaller,
-                  icon: const Icon(Icons.phone, size: 30, color: Colors.white),
-                  label: const Text(
-                    "DIAL EMERGENCY",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
+                  onPressed: () {},
+                  onLongPress: _launchCaller,
+                  icon: Row(children:[
+                    const Icon(Icons.phone, size: 30, color: Colors.white),
+                    SizedBox(width: 15),
+                  ]),
+                  label: Column(children: [
+                    SizedBox(height: 15),
+                    const Text(
+                      "DIAL EMERGENCY",
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    const Text(
+                      "Press & Hold",
+                      style: TextStyle(fontSize: 12),
+                    )
+                  ]),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE53935),
                     foregroundColor: Colors.white,
