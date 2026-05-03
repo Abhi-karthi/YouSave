@@ -13,38 +13,62 @@ import 'package:flutter/material.dart';
 import 'call911.dart';
 import 'dart:async';
 
-// class MyTimerScreen extends StatefulWidget {
-//   @override
-//   _MyTimerScreenState createState() => _MyTimerScreenState();
-// }
+class CountdownOverlay extends StatefulWidget {
+  final VoidCallback onCountdownComplete;
 
-// class _MyTimerScreenState extends State<MyTimerScreen> {
-//   // 1. Declare variables
-//   int _timeLeft = 60; // Starting time in seconds
-//   Timer? _timer; // The Timer object
-//   bool _isRunning = false;
+  const CountdownOverlay({super.key, required this.onCountdownComplete});
 
-//   // 2. Start Timer Method
-//   void _startTimer() {
-//     if (_isRunning) return; // Prevent multiple timers from starting
+  @override
+  State<CountdownOverlay> createState() => _CountdownOverlayState();
+}
 
-//     setState(() {
-//       _isRunning = true;
-//     });
+class _CountdownOverlayState extends State<CountdownOverlay> {
+  int count = 2; // Starts at 2 seconds
 
-//     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-//       setState(() {
-//         if (_timeLeft > 0) {
-//           _timeLeft--;
-//         } else {
-//           // Stop when it hits 0
-//           _timer?.cancel();
-//           _isRunning = false;
-//         }
-//       });
-//     });
-//   }
-// }
+  @override
+  void initState() {
+    super.initState();
+    _startCountdown();
+  }
+
+  void _startCountdown() async {
+    // Loop to handle the countdown
+    while (count > 0) {
+      await Future.delayed(Duration(seconds: 1));
+      if (mounted) {
+        setState(() {
+          count--;
+        });
+      }
+    }
+
+    // Optional: wait a split second on "0" or "GO!" before closing
+    await Future.delayed(Duration(milliseconds: 500));
+
+    if (mounted) {
+      widget.onCountdownComplete(); // Tell the parent we are done!
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // A transparent dialog lets the gray barrier show through behind the text
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Center(
+        child: Text(
+          count > 0 ? '$count' : 'GO!',
+          style: TextStyle(
+            fontSize: 120,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class CPRPage extends StatefulWidget {
   @override
@@ -53,13 +77,75 @@ class CPRPage extends StatefulWidget {
 }
 
 class _CPRPageState extends State<CPRPage> {
+
+  int round = 1;
+  int totalBeats = 0;
+  int beats = 0;
+  bool counting = true;
+
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Wait for the screen to build, THEN show the countdown
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showCountdownDialog();
+    });
+  }
+
+  void _showCountdownDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevents user from tapping outside to dismiss it early
+      builder: (BuildContext context) {
+        return CountdownOverlay(
+          onCountdownComplete: () {
+            Navigator.of(context).pop(); // 1. Close the dialog
+            _startTimer();               // 2. Start your main CPR timer
+          },
+        );
+      },
+    );
+  }
+
+  void _startTimer() {
+    // Your exact timer logic from before goes here!
+    _timer = Timer.periodic(Duration(milliseconds: 600), (timer) {
+      if (counting) {
+        setState(() {
+          totalBeats++;
+          beats++;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // ALWAYS cancel timers when leaving the page to prevent memory leaks
+    super.dispose();
+  }
+
+  void _togglePause() {
+    setState(() {
+      counting = !counting;
+    });
+  }
+
+  void _resetCounts() {
+    setState(() {
+      round = 1;
+      totalBeats = 0;
+      beats = 0;
+      // Optional: counting = true; if you want it to auto-resume on reset
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var round = 1;
-    var totalBeats = 0;
-    var beats = 0;
-    var counting = true;
 
     return Scaffold(
       appBar: AppBar(title: Text('CPR Instructions')),
@@ -80,7 +166,10 @@ class _CPRPageState extends State<CPRPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                PauseButton(counting: counting),
+                PauseButton(
+                  isCounting: counting,
+                  onToggle: _togglePause,
+                ),
                 SizedBox(width: 20),
                 RestartButton(
                   rounds: round,
@@ -168,51 +257,35 @@ class _RestartButtonState extends State<RestartButton> {
   }
 }
 
-class PauseButton extends StatefulWidget {
-  final bool counting; // This is a "snapshot" and can NEVER change
-  const PauseButton({super.key, required this.counting});
+class PauseButton extends StatelessWidget {
+  final bool isCounting; // The information
+  final VoidCallback onToggle; // The remote control
 
-  @override
-  State<PauseButton> createState() => _PauseButtonState();
-}
-
-class _PauseButtonState extends State<PauseButton> {
-  // 1. Create a local variable that CAN change
-  late bool localIsCounting;
-
-  @override
-  void initState() {
-    super.initState();
-    // 2. Initialize it ONCE using the value passed from the constructor
-    localIsCounting = widget.counting;
-  }
+  const PauseButton({
+    super.key,
+    required this.isCounting,
+    required this.onToggle
+  });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        // 3. Use setState to flip the local variable and RE-DRAW the button
-        setState(() {
-          localIsCounting = !localIsCounting;
-        });
-        print("The button now says: $localIsCounting");
-      },
+      onPressed: onToggle, // When pressed, use the remote control!
       style: ElevatedButton.styleFrom(
         backgroundColor: Color.fromARGB(255, 242, 232, 232),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      // 4. Use the local variable to decide what text to show
       child: Row(
         children: [
           Icon(
-            localIsCounting ? Icons.pause : Icons.play_arrow,
+            isCounting ? Icons.pause : Icons.play_arrow,
             size: 22,
             color: const Color.fromARGB(255, 0, 0, 0),
           ),
           SizedBox(width: 10),
           Text(
-            localIsCounting ? 'Pause' : 'Resume',
+            isCounting ? 'Pause' : 'Resume',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
