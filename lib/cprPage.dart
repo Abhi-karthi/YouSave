@@ -96,10 +96,6 @@ class _CPRPageState extends State<CPRPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showCountdownDialog();
     });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showCountdownDialog();
-    });
   }
 
   void _showCountdownDialog() {
@@ -184,6 +180,36 @@ class _CPRPageState extends State<CPRPage> {
               ],
             ),
             SizedBox(height: 30,),
+            Container(
+              width: 300,
+              height: 150,
+              padding: EdgeInsets.all(20),
+              margin: EdgeInsets.symmetric(vertical: 10),
+
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(16), // Rounded corners
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1), // A soft drop shadow
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                    offset: Offset(0, 4), // Moves the shadow down slightly
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'How to perform CPR - add age here',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Text('Tap here to begin'),
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -228,57 +254,6 @@ class RestartButton extends StatelessWidget {
     );
   }
 }
-
-// class RestartButton extends StatefulWidget {
-//   final VoidCallback reset;
-//   const RestartButton({
-//     super.key,
-//     required this.reset,
-//   });
-//
-//   @override
-//   State<RestartButton> createState() => _RestartButtonState();
-// }
-//
-// class _RestartButtonState extends State<RestartButton> {
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return ElevatedButton(
-//       onPressed: () {
-//         setState(() {
-//           reset();
-//         });
-//         print(
-//           "Reset to Round: $localRounds, Beats: $localBeats, Total Beats: $localTotalBeats",
-//         );
-//       },
-//       style: ElevatedButton.styleFrom(
-//         backgroundColor: Color.fromARGB(255, 242, 232, 232),
-//         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-//       ),
-//       child: Row(
-//         children: [
-//           Icon(
-//             Icons.restart_alt,
-//             size: 18,
-//             color: const Color.fromARGB(255, 0, 0, 0),
-//           ),
-//           SizedBox(width: 4),
-//           Text(
-//             "Reset",
-//             style: TextStyle(
-//               fontSize: 14,
-//               fontWeight: FontWeight.bold,
-//               color: const Color.fromARGB(255, 0, 0, 0),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 class PauseButton extends StatelessWidget {
   final bool isCounting; // The information
