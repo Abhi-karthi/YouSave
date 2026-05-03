@@ -12,6 +12,7 @@ import 'cprConfirmation.dart';
 import 'package:flutter/material.dart';
 import 'call911.dart';
 import 'dart:async';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CountdownOverlay extends StatefulWidget {
   final VoidCallback onCountdownComplete;
@@ -28,6 +29,7 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
   @override
   void initState() {
     super.initState();
+
     _startCountdown();
   }
 
@@ -89,7 +91,12 @@ class _CPRPageState extends State<CPRPage> {
   void initState() {
     super.initState();
 
-    // Wait for the screen to build, THEN show the countdown
+    WakelockPlus.enable(); // 1. Turn it ON when the CPR Page opens
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showCountdownDialog();
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showCountdownDialog();
     });
@@ -125,6 +132,7 @@ class _CPRPageState extends State<CPRPage> {
   @override
   void dispose() {
     _timer?.cancel(); // ALWAYS cancel timers when leaving the page to prevent memory leaks
+    WakelockPlus.disable();
     super.dispose();
   }
 
@@ -145,7 +153,6 @@ class _CPRPageState extends State<CPRPage> {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
 
     return Scaffold(
       appBar: AppBar(title: Text('CPR Instructions')),
