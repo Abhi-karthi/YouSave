@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 import 'main.dart';
 import 'homepage.dart';
@@ -15,16 +16,26 @@ class SelectAgePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     return Scaffold(
-      appBar: AppBar(title: Text('Select Age:')),
+      appBar: AppBar(title: Text('Age Selection')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              "Select Age:",
+              style: TextStyle(
+                color: Color.fromARGB(255, 255, 61, 61),
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+              ),
+            ),
+            SizedBox(height: 50),
             AdultElevatedButton(),
             SizedBox(height: 60),
             ChildElevatedButton(),
             SizedBox(height: 60),
             InfantElevatedButton(),
+            SizedBox(height: 40),
           ],
         ),
       ),

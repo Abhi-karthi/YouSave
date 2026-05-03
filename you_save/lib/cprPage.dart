@@ -11,6 +11,40 @@ import 'select_age.dart';
 import 'cprConfirmation.dart';
 import 'package:flutter/material.dart';
 import 'call911.dart';
+import 'dart:async';
+
+// class MyTimerScreen extends StatefulWidget {
+//   @override
+//   _MyTimerScreenState createState() => _MyTimerScreenState();
+// }
+
+// class _MyTimerScreenState extends State<MyTimerScreen> {
+//   // 1. Declare variables
+//   int _timeLeft = 60; // Starting time in seconds
+//   Timer? _timer; // The Timer object
+//   bool _isRunning = false;
+
+//   // 2. Start Timer Method
+//   void _startTimer() {
+//     if (_isRunning) return; // Prevent multiple timers from starting
+
+//     setState(() {
+//       _isRunning = true;
+//     });
+
+//     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+//       setState(() {
+//         if (_timeLeft > 0) {
+//           _timeLeft--;
+//         } else {
+//           // Stop when it hits 0
+//           _timer?.cancel();
+//           _isRunning = false;
+//         }
+//       });
+//     });
+//   }
+// }
 
 class CPRPage extends StatefulWidget {
   @override
@@ -219,7 +253,16 @@ class Call911Button extends StatelessWidget {
             SizedBox(width: 20),
             Text(
               'Call 911',
-              style: TextStyle(fontSize: 18, color: Colors.white),
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 20),
+            Text(
+              "(If anyone else isn't available)",
+              style: TextStyle(fontSize: 12, color: Colors.white),
             ),
           ],
         ),
