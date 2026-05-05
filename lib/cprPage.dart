@@ -152,6 +152,15 @@ class _CPRPageState extends State<CPRPage> {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var currAge = appState.currentAge;
+    double instructionsHeight;
+    if (currAge == "Infant") {
+      instructionsHeight = 360;
+    } else if (currAge == "Child") {
+      instructionsHeight = 300;
+    } else {
+      instructionsHeight = 320;
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('CPR Instructions')),
       body: Center(
@@ -185,7 +194,7 @@ class _CPRPageState extends State<CPRPage> {
             Container(  // CPR instructions container
               // Styling:
               width: 350,
-              height: 150,
+              height: instructionsHeight,
               padding: EdgeInsets.all(20),
               margin: EdgeInsets.symmetric(vertical: 10),
 
@@ -204,10 +213,36 @@ class _CPRPageState extends State<CPRPage> {
 
               // Values
               child: CPRInstructionText(currAge: currAge)
-            )
-          ],
-        ),
-      ),
+            ),
+            SizedBox(height: 20),
+      // Container(  // CPR instructions container
+      //   // Styling:
+      //     width: 350,
+      //     height: 200,
+      //     padding: EdgeInsets.all(20),
+      //     margin: EdgeInsets.symmetric(vertical: 10),
+      //
+      //     decoration: BoxDecoration(
+      //       color: Colors.grey.shade200,
+      //       borderRadius: BorderRadius.circular(16), // Rounded corners
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: Colors.black.withOpacity(0.1), // A soft drop shadow
+      //           blurRadius: 10,
+      //           spreadRadius: 2,
+      //           offset: Offset(0, 4), // Moves the shadow down slightly
+      //         ),
+      //       ],
+      //     ),
+      //
+      //     // Values
+      //     child: Column(children: [
+      //
+      //     ])
+      // ),
+      ],
+    ),
+    ),
     );
   }
 }
@@ -242,12 +277,17 @@ class CPRInstructionText extends StatelessWidget {
     }
     return Column(
       children: [
+        Text(
+          'How to perform CPR - $currAge',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 20),
         Row(
           children:[
             Icon(
-              CupertinoIcons.checkmark_seal_fill,
+              Icons.verified,
               color: Colors.red, // Matches your image
-              size: 40.0,
+              size: 20.0,
             ),
             SizedBox(width: 10),
             Expanded(
@@ -261,9 +301,9 @@ class CPRInstructionText extends StatelessWidget {
         Row(
             children:[
               Icon(
-                CupertinoIcons.checkmark_seal_fill,
+                Icons.verified,
                 color: Colors.red, // Matches your image
-                size: 40.0,
+                size: 20,
               ),
               SizedBox(width: 10),
               Expanded(
@@ -277,9 +317,9 @@ class CPRInstructionText extends StatelessWidget {
         Row(
             children:[
               Icon(
-                CupertinoIcons.checkmark_seal_fill,
+                Icons.verified,
                 color: Colors.red, // Matches your image
-                size: 40.0,
+                size: 20.0,
               ),
               SizedBox(width: 10),
               Expanded(
