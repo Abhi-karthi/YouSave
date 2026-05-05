@@ -163,7 +163,9 @@ class _CPRPageState extends State<CPRPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text('CPR Instructions')),
-      body: Center(
+      body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -215,38 +217,54 @@ class _CPRPageState extends State<CPRPage> {
               child: CPRInstructionText(currAge: currAge)
             ),
             SizedBox(height: 20),
-      // Container(  // CPR instructions container
-      //   // Styling:
-      //     width: 350,
-      //     height: 200,
-      //     padding: EdgeInsets.all(20),
-      //     margin: EdgeInsets.symmetric(vertical: 10),
-      //
-      //     decoration: BoxDecoration(
-      //       color: Colors.grey.shade200,
-      //       borderRadius: BorderRadius.circular(16), // Rounded corners
-      //       boxShadow: [
-      //         BoxShadow(
-      //           color: Colors.black.withOpacity(0.1), // A soft drop shadow
-      //           blurRadius: 10,
-      //           spreadRadius: 2,
-      //           offset: Offset(0, 4), // Moves the shadow down slightly
-      //         ),
-      //       ],
-      //     ),
-      //
-      //     // Values
-      //     child: Column(children: [
-      //
-      //     ])
-      // ),
+      Container(  // CPR instructions container
+        // Styling:
+          width: 350,
+          height: 200,
+          padding: EdgeInsets.all(20),
+          margin: EdgeInsets.symmetric(vertical: 40),
+
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(16), // Rounded corners
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1), // A soft drop shadow
+                blurRadius: 10,
+                spreadRadius: 2,
+                offset: Offset(0, 4), // Moves the shadow down slightly
+              ),
+            ],
+          ),
+
+          // Values
+          child: StopCPR()
+      ),
       ],
     ),
     ),
+    )
     );
   }
 }
 
+class StopCPR extends StatefulWidget {
+  const StopCPR({super.key});
+
+  @override
+  State<StopCPR> createState() => _StopCPRState();
+}
+
+class _StopCPRState extends State<StopCPR> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+
+    ]);
+  }
+}
+
+// region CPR Instruction Text
 class CPRInstructionText extends StatelessWidget {
   final String currAge;
   const CPRInstructionText({
@@ -333,6 +351,7 @@ class CPRInstructionText extends StatelessWidget {
     );
   }
 }
+// endregion
 
 class RestartButton extends StatelessWidget {
   final VoidCallback reset;
