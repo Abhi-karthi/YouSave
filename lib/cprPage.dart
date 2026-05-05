@@ -87,6 +87,7 @@ class _CPRPageState extends State<CPRPage> {
   int totalBeats = 0;
   int beats = 0;
   bool counting = true;
+  final GlobalKey<_StopCPRState> childKey = GlobalKey();
 
   Timer? _timer;
 
@@ -220,37 +221,63 @@ class _CPRPageState extends State<CPRPage> {
               // Values
               child: CPRInstructionText(currAge: currAge)
             ),
-      Container(  // CPR instructions container
-        // Styling:
-          width: 350,
-          height: 300,
-          padding: EdgeInsets.all(20),
-          margin: EdgeInsets.symmetric(vertical: 40),
+            Container(  // CPR instructions container
+              // Styling:
+                width: 350,
+                height: 300,
+                padding: EdgeInsets.all(20),
+                margin: EdgeInsets.symmetric(vertical: 40),
 
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(16), // Rounded corners
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1), // A soft drop shadow
-                blurRadius: 10,
-                spreadRadius: 2,
-                offset: Offset(0, 4), // Moves the shadow down slightly
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(16), // Rounded corners
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1), // A soft drop shadow
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                      offset: Offset(0, 4), // Moves the shadow down slightly
+                    ),
+                  ],
+                ),
+
+                // Values
+                child: StopCPR()
+            ),
+          SizedBox(
+            width: 383,
+            child: ElevatedButton(
+              onPressed: () {
+                print('Stop CPR NOW');
+              },
+              onLongPress: () {
+                // TODO: Add
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 255, 68, 65),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ],
-          ),
-
-          // Values
-          child: StopCPR()
+              child: Text(
+                'Done',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ),
+            ),
+          ],
+        ),
       ),
-      ],
-    ),
-    ),
-    )
-    );
+    ));
   }
 }
 
+// region MARK: Stop CPR Section
 class StopCPR extends StatefulWidget {
   const StopCPR({super.key});
 
@@ -338,7 +365,7 @@ class _StopCPRState extends State<StopCPR> {
         onPressed: button1,
         child: Row(children: [
           Icon(
-              personRegainedConsciousness ? Icons.check_box : Icons.check_box_outline_blank,
+              personRegainedConsciousness ? Icons.radio_button_checked : Icons.radio_button_unchecked,
               color: Colors.red,
               size: 25,
           ),
@@ -354,7 +381,7 @@ class _StopCPRState extends State<StopCPR> {
           onPressed: button2,
           child: Row(children: [
             Icon(
-              EMSArrivedAndTookOver ? Icons.check_box : Icons.check_box_outline_blank,
+              EMSArrivedAndTookOver ? Icons.radio_button_checked : Icons.radio_button_unchecked,
               color: Colors.red,
               size: 25,
             ),
@@ -370,7 +397,7 @@ class _StopCPRState extends State<StopCPR> {
           onPressed: button3,
           child: Row(children: [
             Icon(
-              AEDInUseSwitchedCare ? Icons.check_box : Icons.check_box_outline_blank,
+              AEDInUseSwitchedCare ? Icons.radio_button_checked : Icons.radio_button_unchecked,
               color: Colors.red,
               size: 25,
             ),
@@ -386,7 +413,7 @@ class _StopCPRState extends State<StopCPR> {
         onPressed: button4,
         child: Row(children: [
           Icon(
-            tooExhaustedToContinue ? Icons.check_box : Icons.check_box_outline_blank,
+            tooExhaustedToContinue ? Icons.radio_button_checked : Icons.radio_button_unchecked,
             color: Colors.red,
             size: 25,
           ),
@@ -396,10 +423,11 @@ class _StopCPRState extends State<StopCPR> {
             style: TextStyle(fontSize: 16, color: Colors.black),
           )
         ])
-      )
+      ),
     ]);
   }
 }
+// endregion
 
 // region MARK: CPR Instruction Text
 class CPRInstructionText extends StatelessWidget {
