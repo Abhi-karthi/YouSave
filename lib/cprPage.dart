@@ -220,11 +220,10 @@ class _CPRPageState extends State<CPRPage> {
               // Values
               child: CPRInstructionText(currAge: currAge)
             ),
-            SizedBox(height: 20),
       Container(  // CPR instructions container
         // Styling:
           width: 350,
-          height: 200,
+          height: 300,
           padding: EdgeInsets.all(20),
           margin: EdgeInsets.symmetric(vertical: 40),
 
@@ -273,33 +272,131 @@ class _StopCPRState extends State<StopCPR> {
   }
 
   void button1() {
-    off();
-    if (personRegainedConsciousness) return;
-    personRegainedConsciousness = true;
+    setState(() {
+      bool backOn = false;
+      if (!personRegainedConsciousness) {
+        backOn = true;
+      }
+      off();
+      if (backOn) personRegainedConsciousness = true;
+    });
   }
 
   void button2() {
-    off();
-    if (EMSArrivedAndTookOver) return;
-    EMSArrivedAndTookOver = true;
+    setState(() {
+      bool backOn = false;
+      if (!EMSArrivedAndTookOver) {
+        backOn = true;
+      }
+      off();
+      if (backOn) EMSArrivedAndTookOver = true;
+    });
   }
 
   void button3() {
-    off();
-    if (AEDInUseSwitchedCare) return;
-    AEDInUseSwitchedCare = true;
+    setState(() {
+      bool backOn = false;
+      if (!AEDInUseSwitchedCare) {
+        backOn = true;
+      }
+      off();
+      if (backOn) AEDInUseSwitchedCare = true;
+    });
   }
 
   void button4() {
-    off();
-    if (tooExhaustedToContinue) return;
-    tooExhaustedToContinue = true;
+    setState(() {
+      bool backOn = false;
+      if (!tooExhaustedToContinue) {
+        backOn = true;
+      }
+      off();
+      if (backOn) tooExhaustedToContinue = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-
+      Text(
+        "Stop CPR Checklist",
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        )
+      ),
+      Text(
+        "Only one of the options has to be checked.",
+        style: TextStyle(
+          color: Colors.grey,
+          fontSize: 10,
+        )
+      ),
+      SizedBox(height: 5),
+      TextButton(
+        onPressed: button1,
+        child: Row(children: [
+          Icon(
+              personRegainedConsciousness ? Icons.check_box : Icons.check_box_outline_blank,
+              color: Colors.red,
+              size: 25,
+          ),
+          SizedBox(width: 10),
+          Text(
+            "Person regained consciousness",
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          )
+        ])
+      ),
+      SizedBox(height: 5),
+      TextButton(
+          onPressed: button2,
+          child: Row(children: [
+            Icon(
+              EMSArrivedAndTookOver ? Icons.check_box : Icons.check_box_outline_blank,
+              color: Colors.red,
+              size: 25,
+            ),
+            SizedBox(width: 10),
+            Text(
+              "EMS arrived and took over",
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            )
+          ])
+      ),
+      SizedBox(height: 5,),
+      TextButton(
+          onPressed: button3,
+          child: Row(children: [
+            Icon(
+              AEDInUseSwitchedCare ? Icons.check_box : Icons.check_box_outline_blank,
+              color: Colors.red,
+              size: 25,
+            ),
+            SizedBox(width: 10),
+            Text(
+              "AED in use / switched care",
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            )
+          ])
+      ),
+      SizedBox(height: 5,),
+      TextButton(
+        onPressed: button4,
+        child: Row(children: [
+          Icon(
+            tooExhaustedToContinue ? Icons.check_box : Icons.check_box_outline_blank,
+            color: Colors.red,
+            size: 25,
+          ),
+          SizedBox(width: 10),
+          Text(
+            "Too exhausted to continue",
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          )
+        ])
+      )
     ]);
   }
 }
