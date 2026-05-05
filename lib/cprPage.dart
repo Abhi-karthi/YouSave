@@ -149,7 +149,8 @@ class _CPRPageState extends State<CPRPage> {
 
   @override
   Widget build(BuildContext context) {
-
+    var appState = context.watch<MyAppState>();
+    var currAge = appState.currentAge;
     return Scaffold(
       appBar: AppBar(title: Text('CPR Instructions')),
       body: Center(
@@ -202,7 +203,7 @@ class _CPRPageState extends State<CPRPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'How to perform CPR - add age here',
+                    'How to perform CPR - $currAge',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
