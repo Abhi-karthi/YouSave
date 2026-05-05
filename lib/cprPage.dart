@@ -15,6 +15,7 @@ import 'call911.dart';
 import 'dart:async';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+// region Countdown
 class CountdownOverlay extends StatefulWidget {
   final VoidCallback onCountdownComplete;
 
@@ -72,6 +73,7 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
     );
   }
 }
+// endregion
 
 class CPRPage extends StatefulWidget {
   @override
@@ -88,6 +90,7 @@ class _CPRPageState extends State<CPRPage> {
 
   Timer? _timer;
 
+  // region Timer Logic
   @override
   void initState() {
     super.initState();
@@ -147,6 +150,7 @@ class _CPRPageState extends State<CPRPage> {
       // Optional: counting = true; if you want it to auto-resume on reset
     });
   }
+  // endregion
 
   @override
   Widget build(BuildContext context) {
@@ -256,6 +260,42 @@ class StopCPR extends StatefulWidget {
 }
 
 class _StopCPRState extends State<StopCPR> {
+  bool personRegainedConsciousness = false;
+  bool EMSArrivedAndTookOver = false;
+  bool AEDInUseSwitchedCare = false;
+  bool tooExhaustedToContinue = false;
+
+  void off() {
+    personRegainedConsciousness = false;
+    EMSArrivedAndTookOver = false;
+    AEDInUseSwitchedCare = false;
+    tooExhaustedToContinue = false;
+  }
+
+  void button1() {
+    off();
+    if (personRegainedConsciousness) return;
+    personRegainedConsciousness = true;
+  }
+
+  void button2() {
+    off();
+    if (EMSArrivedAndTookOver) return;
+    EMSArrivedAndTookOver = true;
+  }
+
+  void button3() {
+    off();
+    if (AEDInUseSwitchedCare) return;
+    AEDInUseSwitchedCare = true;
+  }
+
+  void button4() {
+    off();
+    if (tooExhaustedToContinue) return;
+    tooExhaustedToContinue = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -264,7 +304,7 @@ class _StopCPRState extends State<StopCPR> {
   }
 }
 
-// region CPR Instruction Text
+// region MARK: CPR Instruction Text
 class CPRInstructionText extends StatelessWidget {
   final String currAge;
   const CPRInstructionText({
@@ -353,6 +393,7 @@ class CPRInstructionText extends StatelessWidget {
 }
 // endregion
 
+// region MARK: Restart and Pause Buttons
 class RestartButton extends StatelessWidget {
   final VoidCallback reset;
   const RestartButton({
@@ -431,7 +472,9 @@ class PauseButton extends StatelessWidget {
     );
   }
 }
+// endregion
 
+// region MARK: Call 911 Button
 class Call911Button extends StatelessWidget {
   const Call911Button({super.key});
 
@@ -481,3 +524,4 @@ class Call911Button extends StatelessWidget {
     );
   }
 }
+// endregion
