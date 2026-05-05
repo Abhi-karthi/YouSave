@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:english_words/english_words.dart';
 import 'package:english_words/src/word_pair.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -157,17 +158,17 @@ class _CPRPageState extends State<CPRPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Call911Button(),
+            Call911Button(),  // 911 Button
             SizedBox(height: 20),
-            Text(
+            Text(  // Round and beats small text
               'Round $round | Total Beats: $totalBeats',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            Text(
+            Text(  // Big beats text
               '$beats',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 75),
             ),
-            Row(
+            Row(  // Pause and resume buttons
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 PauseButton(
@@ -181,8 +182,9 @@ class _CPRPageState extends State<CPRPage> {
               ],
             ),
             SizedBox(height: 30,),
-            Container(
-              width: 300,
+            Container(  // CPR instructions container
+              // Styling:
+              width: 350,
               height: 150,
               padding: EdgeInsets.all(20),
               margin: EdgeInsets.symmetric(vertical: 10),
@@ -199,21 +201,95 @@ class _CPRPageState extends State<CPRPage> {
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'How to perform CPR - $currAge',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  Text('Tap here to begin'),
-                ],
-              ),
+
+              // Values
+              child: CPRInstructionText(currAge: currAge)
             )
           ],
         ),
       ),
+    );
+  }
+}
+
+class CPRInstructionText extends StatelessWidget {
+  final String currAge;
+  const CPRInstructionText({
+    super.key,
+    required this.currAge,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    String instructions_1 = "";
+    String instructions_2 = "";
+    String instructions_3 = "";
+
+    if (currAge == "Adult") {
+      instructions_1 = "Tap & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
+      instructions_2 = "Hands only: heel of hand center of chest, other hand on top; arms straight. Push hard & fast (100-120/min), depth at least 2 in (5 cm). Allow full recoil.";
+      instructions_3 = "Minimize interruptions. Use an AED immediately when it arrives.";
+    }
+    else if (currAge == "Child") {
+      instructions_1 = "Tap & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
+      instructions_2 = "Use 1 or 2 hands on the center of the chest. Push hard & fast (100-120/min), depth about 2 in (5 cm). Allow full recoil.";
+      instructions_3 = "Minimize interruptions. Use an AED immediately (use child pads if available).";
+    }
+    else if (currAge == "Infant") {
+      instructions_1 = "Tap bottom of foot & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
+      instructions_2 = "Use 2 fingers in the center of the chest, just below the nipple line. Push hard & fast (100-120/min), depth about 1.5 in (4 cm). Allow full recoil.";
+      instructions_3 = "Minimize interruptions. Use an AED immediately (use infant pads if available).";
+    }
+    return Column(
+      children: [
+        Row(
+          children:[
+            Icon(
+              CupertinoIcons.checkmark_seal_fill,
+              color: Colors.red, // Matches your image
+              size: 40.0,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                instructions_1,
+              ),
+            )
+          ]
+        ),
+        SizedBox(height: 20),
+        Row(
+            children:[
+              Icon(
+                CupertinoIcons.checkmark_seal_fill,
+                color: Colors.red, // Matches your image
+                size: 40.0,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  instructions_2,
+                ),
+              )
+            ]
+        ),
+        SizedBox(height: 20),
+        Row(
+            children:[
+              Icon(
+                CupertinoIcons.checkmark_seal_fill,
+                color: Colors.red, // Matches your image
+                size: 40.0,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  instructions_3,
+                ),
+              )
+            ]
+        ),
+      ],
     );
   }
 }
