@@ -300,14 +300,23 @@ class _CPRPageState extends State<CPRPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                child: Column(children: [
+                  const Text(
+                    'Done',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
+                  const Text(
+                    '(Press & hold)',
+                    style: TextStyle(
+                      fontSize: 8,
+                      color: Colors.white,
+                    )
+                  )
+                ])
               ),
             ),
           ),
