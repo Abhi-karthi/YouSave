@@ -16,7 +16,7 @@ import 'call911.dart';
 import 'dart:async';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-// region Countdown
+// region MARK: Countdown
 class CountdownOverlay extends StatefulWidget {
   final VoidCallback onCountdownComplete;
 
@@ -137,7 +137,7 @@ class _CPRPageState extends State<CPRPage> {
           beatsNotifier.value = 0;
           roundNotifier.value++;
           _togglePause();
-          // TODO: Add rescue breaths
+          _showBreathsMenu();
         }
       }
     });
@@ -167,6 +167,37 @@ class _CPRPageState extends State<CPRPage> {
     totalBeatsNotifier.value = 0;
     beatsNotifier.value = 0;
     // Optional: counting = true; if you want it to auto-resume on reset
+  }
+  // endregion
+
+  // region MARK: Rescue Breaths
+  void _showBreathsMenu() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white, // Gives the menu a visible background
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children:[
+              Text(
+                "Round 1 Complete",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )
+              ),
+              SizedBox(height: 10),
+            ]
+          )
+        );
+      }
+    );
   }
   // endregion
 
