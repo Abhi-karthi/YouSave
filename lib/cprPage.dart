@@ -83,9 +83,11 @@ class CPRPage extends StatefulWidget {
 
 class _CPRPageState extends State<CPRPage> {
 
-  int round = 1;
-  int totalBeats = 0;
-  int beats = 0;
+  final ValueNotifier<int> roundNotifier = ValueNotifier(1);
+  final ValueNotifier<int> totalBeatsNotifier = ValueNotifier(0);
+  final ValueNotifier<int> beatsNotifier = ValueNotifier(0);
+  final ScrollController _scrollController = ScrollController();
+
   bool counting = true;
   final GlobalKey<_StopCPRState> childKey = GlobalKey();
 
@@ -122,18 +124,26 @@ class _CPRPageState extends State<CPRPage> {
     // Your exact timer logic from before goes here!
     _timer = Timer.periodic(Duration(milliseconds: 600), (timer) {
       if (counting) {
-        setState(() {
-          totalBeats++;
-          beats++;
-        });
+        totalBeatsNotifier.value++;
+        beatsNotifier.value++;
+        if (beatsNotifier.value >= 30) {
+          beatsNotifier.value = 0;
+          roundNotifier.value++;
+        }
       }
     });
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // ALWAYS cancel timers when leaving the page to prevent memory leaks
+    _timer?.cancel();
     WakelockPlus.disable();
+
+    roundNotifier.dispose();
+    totalBeatsNotifier.dispose();
+    beatsNotifier.dispose();
+    _scrollController.dispose();
+
     super.dispose();
   }
 
@@ -144,18 +154,16 @@ class _CPRPageState extends State<CPRPage> {
   }
 
   void _resetCounts() {
-    setState(() {
-      round = 1;
-      totalBeats = 0;
-      beats = 0;
-      // Optional: counting = true; if you want it to auto-resume on reset
-    });
+    roundNotifier.value = 1;
+    totalBeatsNotifier.value = 0;
+    beatsNotifier.value = 0;
+    // Optional: counting = true; if you want it to auto-resume on reset
   }
   // endregion
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+    var appState = context.read<MyAppState>();
     var currAge = appState.currentAge;
     double instructionsHeight;
     if (currAge == "Infant") {
@@ -167,113 +175,146 @@ class _CPRPageState extends State<CPRPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('CPR Instructions')),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Call911Button(),  // 911 Button
-            SizedBox(height: 20),
-            Text(  // Round and beats small text
-              'Round $round | Total Beats: $totalBeats',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(  // Big beats text
-              '$beats',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 75),
-            ),
-            Row(  // Pause and resume buttons
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PauseButton(
-                  isCounting: counting,
-                  onToggle: _togglePause,
-                ),
-                SizedBox(width: 20),
-                RestartButton(
-                  reset: _resetCounts,
-                ),
-              ],
-            ),
-            SizedBox(height: 30,),
-            Container(  // CPR instructions container
-              // Styling:
-              width: 350,
-              height: instructionsHeight,
-              padding: EdgeInsets.all(20),
-              margin: EdgeInsets.symmetric(vertical: 10),
+      appBar: AppBar(title: const Text('CPR Instructions')),
+      // 1. REPLACED SingleChildScrollView with a robust ListView
+      body: ListView(
+        controller: _scrollController,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        children: [
+          const Center(child: Call911Button()),
+          const SizedBox(height: 20),
 
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(16), // Rounded corners
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1), // A soft drop shadow
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                    offset: Offset(0, 4), // Moves the shadow down slightly
+          // 2. THE FIX: ExcludeSemantics hides the rapid updates from iOS
+          ExcludeSemantics(
+            child: SizedBox(
+              height: 25,
+              child: ValueListenableBuilder<int>(
+                valueListenable: totalBeatsNotifier,
+                builder: (context, totalBeats, child) {
+                  return Text(
+                    'Round ${roundNotifier.value} | Total Beats: $totalBeats',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // 3. THE FIX: ExcludeSemantics + fixed height on the big numbers
+          ExcludeSemantics(
+            child: SizedBox(
+              height: 90,
+              child: ValueListenableBuilder<int>(
+                valueListenable: beatsNotifier,
+                builder: (context, beats, child) {
+                  return Text(
+                    '$beats',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 75,
+                        fontFeatures: [FontFeature.tabularFigures()]),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              PauseButton(
+                isCounting: counting,
+                onToggle: _togglePause,
+              ),
+              const SizedBox(width: 20),
+              RestartButton(
+                reset: _resetCounts,
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
+
+          Center(
+            child: RepaintBoundary(
+              child: Container(
+                  width: 350,
+                  height: instructionsHeight,
+                  padding: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-
-              // Values
-              child: CPRInstructionText(currAge: currAge)
+                  child: CPRInstructionText(currAge: currAge)),
             ),
-            Container(  // CPR instructions container
-              // Styling:
-                width: 350,
-                height: 300,
-                padding: EdgeInsets.all(20),
-                margin: EdgeInsets.symmetric(vertical: 40),
+          ),
 
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(16), // Rounded corners
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // A soft drop shadow
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                      offset: Offset(0, 4), // Moves the shadow down slightly
-                    ),
-                  ],
-                ),
+          Center(
+            child: RepaintBoundary(
+              child: Container(
+                  width: 350,
+                  height: 300,
+                  padding: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.symmetric(vertical: 40),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const StopCPR()),
+            ),
+          ),
 
-                // Values
-                child: StopCPR()
-            ),
-          SizedBox(
-            width: 383,
-            child: ElevatedButton(
-              onPressed: () {
-                print('Stop CPR NOW');
-              },
-              onLongPress: () {
-                // TODO: Add
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 255, 68, 65),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          Center(
+            child: SizedBox(
+              width: 383,
+              child: ElevatedButton(
+                onPressed: () {
+                  print('Stop CPR NOW');
+                },
+                onLongPress: () {
+                  // TODO: Add route to next page
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              child: Text(
-                'Done',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 50),
+        ],
       ),
-    ));
+    );
   }
 }
 
@@ -346,35 +387,35 @@ class _StopCPRState extends State<StopCPR> {
   Widget build(BuildContext context) {
     return Column(children: [
       Text(
-        "Stop CPR Checklist",
-        style: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        )
+          "Stop CPR Checklist",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          )
       ),
       Text(
-        "Only one of the options has to be checked.",
-        style: TextStyle(
-          color: Colors.grey,
-          fontSize: 10,
-        )
+          "Only one of the options has to be checked.",
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 10,
+          )
       ),
       SizedBox(height: 5),
       TextButton(
-        onPressed: button1,
-        child: Row(children: [
-          Icon(
+          onPressed: button1,
+          child: Row(children: [
+            Icon(
               personRegainedConsciousness ? Icons.radio_button_checked : Icons.radio_button_unchecked,
               color: Colors.red,
               size: 25,
-          ),
-          SizedBox(width: 10),
-          Text(
-            "Person regained consciousness",
-            style: TextStyle(fontSize: 16, color: Colors.black),
-          )
-        ])
+            ),
+            SizedBox(width: 10),
+            Text(
+              "Person regained consciousness",
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            )
+          ])
       ),
       SizedBox(height: 5),
       TextButton(
@@ -410,19 +451,19 @@ class _StopCPRState extends State<StopCPR> {
       ),
       SizedBox(height: 5,),
       TextButton(
-        onPressed: button4,
-        child: Row(children: [
-          Icon(
-            tooExhaustedToContinue ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-            color: Colors.red,
-            size: 25,
-          ),
-          SizedBox(width: 10),
-          Text(
-            "Too exhausted to continue",
-            style: TextStyle(fontSize: 16, color: Colors.black),
-          )
-        ])
+          onPressed: button4,
+          child: Row(children: [
+            Icon(
+              tooExhaustedToContinue ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+              color: Colors.red,
+              size: 25,
+            ),
+            SizedBox(width: 10),
+            Text(
+              "Too exhausted to continue",
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            )
+          ])
       ),
     ]);
   }
@@ -466,19 +507,19 @@ class CPRInstructionText extends StatelessWidget {
         ),
         SizedBox(height: 20),
         Row(
-          children:[
-            Icon(
-              Icons.verified,
-              color: Colors.red, // Matches your image
-              size: 20.0,
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                instructions_1,
+            children:[
+              Icon(
+                Icons.verified,
+                color: Colors.red, // Matches your image
+                size: 20.0,
               ),
-            )
-          ]
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  instructions_1,
+                ),
+              )
+            ]
         ),
         SizedBox(height: 20),
         Row(
