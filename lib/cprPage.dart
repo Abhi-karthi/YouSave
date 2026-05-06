@@ -5,6 +5,7 @@ import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'main.dart';
 import 'homepage.dart';
@@ -89,6 +90,7 @@ class _CPRPageState extends State<CPRPage> {
   final ScrollController _scrollController = ScrollController();
 
   bool counting = true;
+  bool isDoneActive = false;
   final GlobalKey<_StopCPRState> childKey = GlobalKey();
 
   Timer? _timer;
@@ -99,6 +101,10 @@ class _CPRPageState extends State<CPRPage> {
     super.initState();
 
     WakelockPlus.enable(); // 1. Turn it ON when the CPR Page opens
+
+    AudioPlayer.global.setAudioContext(AudioContextConfig(
+      respectSilence: false, // This forces it to play even if the phone is on silent!
+    ).build());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showCountdownDialog();
@@ -126,9 +132,12 @@ class _CPRPageState extends State<CPRPage> {
       if (counting) {
         totalBeatsNotifier.value++;
         beatsNotifier.value++;
+        AudioPlayer().play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
         if (beatsNotifier.value >= 30) {
           beatsNotifier.value = 0;
           roundNotifier.value++;
+          _togglePause();
+          // TODO: Add rescue breaths
         }
       }
     });
@@ -185,7 +194,6 @@ class _CPRPageState extends State<CPRPage> {
           const Center(child: Call911Button()),
           const SizedBox(height: 20),
 
-          // 2. THE FIX: ExcludeSemantics hides the rapid updates from iOS
           ExcludeSemantics(
             child: SizedBox(
               height: 25,
@@ -202,7 +210,6 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          // 3. THE FIX: ExcludeSemantics + fixed height on the big numbers
           ExcludeSemantics(
             child: SizedBox(
               height: 90,
@@ -222,6 +229,8 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
+          SizedBox(height: 10),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -235,7 +244,7 @@ class _CPRPageState extends State<CPRPage> {
               ),
             ],
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
 
           Center(
             child: RepaintBoundary(
@@ -279,7 +288,13 @@ class _CPRPageState extends State<CPRPage> {
                       ),
                     ],
                   ),
-                  child: const StopCPR()),
+                  child: StopCPR(
+                    onSelectionChanged: (bool isActive) {
+                      setState(() {
+                        isDoneActive = isActive;
+                      });
+                    },
+                  )),
             ),
           ),
 
@@ -287,14 +302,14 @@ class _CPRPageState extends State<CPRPage> {
             child: SizedBox(
               width: 383,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: isDoneActive ? () {
                   print('Stop CPR NOW');
-                },
-                onLongPress: () {
+                } : null,
+                onLongPress: isDoneActive ? () {
                   // TODO: Add route to next page
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                } : null,
+                style: ElevatedButton.styleFrom( // TODO: Make button inactive if option not clicked
+                  backgroundColor: isDoneActive ? const Color.fromARGB(255, 255, 68, 65) : Colors.grey,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -329,7 +344,8 @@ class _CPRPageState extends State<CPRPage> {
 
 // region MARK: Stop CPR Section
 class StopCPR extends StatefulWidget {
-  const StopCPR({super.key});
+  final ValueChanged<bool> onSelectionChanged;
+  const StopCPR({super.key, required this.onSelectionChanged});
 
   @override
   State<StopCPR> createState() => _StopCPRState();
@@ -342,10 +358,12 @@ class _StopCPRState extends State<StopCPR> {
   bool tooExhaustedToContinue = false;
 
   void off() {
-    personRegainedConsciousness = false;
-    EMSArrivedAndTookOver = false;
-    AEDInUseSwitchedCare = false;
-    tooExhaustedToContinue = false;
+    setState(() {
+      personRegainedConsciousness = false;
+      EMSArrivedAndTookOver = false;
+      AEDInUseSwitchedCare = false;
+      tooExhaustedToContinue = false;
+    });
   }
 
   void button1() {
@@ -357,6 +375,7 @@ class _StopCPRState extends State<StopCPR> {
       off();
       if (backOn) personRegainedConsciousness = true;
     });
+    _notifyParent();
   }
 
   void button2() {
@@ -368,6 +387,7 @@ class _StopCPRState extends State<StopCPR> {
       off();
       if (backOn) EMSArrivedAndTookOver = true;
     });
+    _notifyParent();
   }
 
   void button3() {
@@ -379,6 +399,7 @@ class _StopCPRState extends State<StopCPR> {
       off();
       if (backOn) AEDInUseSwitchedCare = true;
     });
+    _notifyParent();
   }
 
   void button4() {
@@ -390,6 +411,16 @@ class _StopCPRState extends State<StopCPR> {
       off();
       if (backOn) tooExhaustedToContinue = true;
     });
+    _notifyParent();
+  }
+
+  void _notifyParent() {
+    // Uses the radio to send the true/false value up to the main page
+    widget.onSelectionChanged(isSelected());
+  }
+
+  bool isSelected() {
+    return personRegainedConsciousness || EMSArrivedAndTookOver || AEDInUseSwitchedCare || tooExhaustedToContinue;
   }
 
   @override
