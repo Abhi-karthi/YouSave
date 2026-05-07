@@ -382,7 +382,51 @@ class RescueBreathsDialogue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Column(
+        children: [
+          const SizedBox(height: 280),
+          const Text(
+            "Ready for Breath 1",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              color: Colors.white,
+            )
+          ),
+          SizedBox(height: 20),
+          SizedBox(
+              width: 383,
+              child: ElevatedButton(
+                  onPressed: () {
+
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.only(top: 2, bottom: 2),
+                    child: Text(
+                      "Deliver Breath 1",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+              )
+          ),
+        ]
+      ),
+    );
   }
 }
 
@@ -460,7 +504,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                   letterSpacing: -1,
                 )
               ),
-              SizedBox(height: 55),
+              SizedBox(height: 10),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: TextButton(
@@ -557,7 +601,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                     )
                 ),
               ),
-              SizedBox(height: 350),
+              SizedBox(height: 395),
               SizedBox(
                   width: 383,
                   child: ElevatedButton(
