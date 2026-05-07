@@ -186,8 +186,19 @@ class _CPRPageState extends State<CPRPage> {
     showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) {
-          return RescueBreathsChecklist();
+          return RescueBreathsChecklist(showRescueBreathsDialogue: _showBreathsDialogue);
         }
+    );
+  }
+
+  void _showBreathsDialogue() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black87,
+      builder: (BuildContext context) {
+        return RescueBreathsDialogue();
+      }
     );
   }
   // endregion
@@ -365,9 +376,23 @@ class _CPRPageState extends State<CPRPage> {
   }
 }
 
+// region MARK: Rescue Breaths Dialogue
+class RescueBreathsDialogue extends StatelessWidget {
+  const RescueBreathsDialogue({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+// endregion
+
 // region MARK: Rescue Breaths Checklist
 class RescueBreathsChecklist extends StatefulWidget {
-  const RescueBreathsChecklist({super.key});
+  final VoidCallback showRescueBreathsDialogue;
+
+  const RescueBreathsChecklist({super.key, required this.showRescueBreathsDialogue});
 
   @override
   State<RescueBreathsChecklist> createState() => _RescueBreathsChecklistState();
@@ -425,7 +450,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
           ),
           child: Column(
             children: [
-              SizedBox(height: 100),
+              SizedBox(height: 75),
               Text(
                 "Rescue Breaths",
                 style: TextStyle(
@@ -435,7 +460,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                   letterSpacing: -1,
                 )
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 55),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: TextButton(
@@ -538,9 +563,8 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_isAllChecked()) {
-                        // TODO: Start guided breaths
-                      } else {
-                        null;
+                        Navigator.of(context)..pop()..pop();
+                        widget.showRescueBreathsDialogue();
                       }
                     },
                     style: ElevatedButton.styleFrom(
