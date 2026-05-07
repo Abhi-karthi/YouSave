@@ -133,7 +133,7 @@ class _CPRPageState extends State<CPRPage> {
         totalBeatsNotifier.value++;
         beatsNotifier.value++;
         AudioPlayer().play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
-        if (beatsNotifier.value >= 1) {
+        if (beatsNotifier.value >= 30) {
           beatsNotifier.value = 0;
           roundNotifier.value++;
           _togglePause();
@@ -176,7 +176,7 @@ class _CPRPageState extends State<CPRPage> {
         barrierDismissible: false, // Prevents closing by tapping the dark background
         barrierColor: Colors.black87,
         builder: (BuildContext context) {
-          return RescueBreathsMenu(roundNotifier: roundNotifier);
+          return RescueBreathsMenu(roundNotifier: roundNotifier, togglePause: _togglePause,);
         }
     );
   }
@@ -356,8 +356,9 @@ class _CPRPageState extends State<CPRPage> {
 // region MARK: Rescue Breaths
 class RescueBreathsMenu extends StatelessWidget {
   final ValueNotifier<int> roundNotifier;
+  final VoidCallback togglePause;
 
-  const RescueBreathsMenu({super.key, required this.roundNotifier});
+  const RescueBreathsMenu({super.key, required this.roundNotifier, required this.togglePause});
 
   @override
   Widget build(BuildContext context) {
@@ -372,50 +373,70 @@ class RescueBreathsMenu extends StatelessWidget {
                   "Round ${roundNotifier.value - 1} Complete",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   )
               ),
-              SizedBox(height: 7),
+              SizedBox(height: 20),
               Text(
                   "30 compressions given. Now provide 2 breaths.",
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 14,
                     color: Colors.white,
                   )
               ),
-              SizedBox(height: 7),
+              SizedBox(height: 20),
               SizedBox(
                 width: 383,
-
                 child: ElevatedButton(
                   onPressed: () {
                     // TODO: Add start breaths functionality
                   },
-                  child: Text(
-                    "Start Breaths (Recommended)",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    )
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 255, 68, 65),
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: Text(
+                      "Start Breaths (Recommended)",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
                   )
                 )
               ),
-              SizedBox(height: 7),
+              SizedBox(height: 18),
               SizedBox(
                 width: 383,
-
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(0, 0, 0, 100),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   onPressed: () {
+                    togglePause;
                     Navigator.pop(context);
                   },
-                  child: Text(
-                    "Continue HandsOnly CPR",
-                    style: TextStyle(
-                      color: Colors.white,
-                    )
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 5, bottom: 5),
+                    child: Text(
+                      "Continue HandsOnly CPR",
+                      style: TextStyle(
+                        color: Colors.white,
+                      )
+                    ),
                   )
                 )
               )
