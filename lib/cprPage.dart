@@ -202,7 +202,7 @@ class _CPRPageState extends State<CPRPage> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 20),
         children: [
-          const Center(child: Call911Button()),
+          Center(child: Call911Button(togglePause: _togglePause)),
           const SizedBox(height: 20),
 
           ExcludeSemantics(
@@ -788,7 +788,9 @@ class PauseButton extends StatelessWidget {
 
 // region MARK: Call 911 Button
 class Call911Button extends StatelessWidget {
-  const Call911Button({super.key});
+  final VoidCallback togglePause;
+
+  const Call911Button({super.key, required this.togglePause});
 
   @override
   Widget build(BuildContext context) {
@@ -797,6 +799,7 @@ class Call911Button extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           print('Call 911 pressed');
+          togglePause();
           Navigator.push(
             context,
             MaterialPageRoute(
