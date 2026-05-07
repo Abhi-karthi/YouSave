@@ -176,7 +176,16 @@ class _CPRPageState extends State<CPRPage> {
         barrierDismissible: false, // Prevents closing by tapping the dark background
         barrierColor: Colors.black87,
         builder: (BuildContext context) {
-          return RescueBreathsMenu(roundNotifier: roundNotifier, togglePause: _togglePause,);
+          return RescueBreathsMenu(roundNotifier: roundNotifier, togglePause: _togglePause, openBreathsChecklist: _showBreathsChecklist,);
+        }
+    );
+  }
+
+  void _showBreathsChecklist() {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return RescueBreathsChecklist();
         }
     );
   }
@@ -202,7 +211,8 @@ class _CPRPageState extends State<CPRPage> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 20),
         children: [
-          Center(child: Call911Button(togglePause: _togglePause)),
+          Center(child: Call911Button(togglePause: _togglePause, isCounting: counting)),
+
           const SizedBox(height: 20),
 
           ExcludeSemantics(
@@ -319,7 +329,7 @@ class _CPRPageState extends State<CPRPage> {
                 onLongPress: isDoneActive ? () {
                   // TODO: Add route to next page
                 } : null,
-                style: ElevatedButton.styleFrom( // TODO: Make button inactive if option not clicked
+                style: ElevatedButton.styleFrom(
                   backgroundColor: isDoneActive ? const Color.fromARGB(255, 255, 68, 65) : Colors.grey,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -353,12 +363,29 @@ class _CPRPageState extends State<CPRPage> {
   }
 }
 
-// region MARK: Rescue Breaths
+// region MARK: Rescue Breaths Checklist
+class RescueBreathsChecklist extends StatefulWidget {
+  const RescueBreathsChecklist({super.key});
+
+  @override
+  State<RescueBreathsChecklist> createState() => _RescueBreathsChecklistState();
+}
+
+class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+// endregion
+
+// region MARK: Rescue Breaths Menu
 class RescueBreathsMenu extends StatelessWidget {
   final ValueNotifier<int> roundNotifier;
   final VoidCallback togglePause;
+  final VoidCallback openBreathsChecklist;
 
-  const RescueBreathsMenu({super.key, required this.roundNotifier, required this.togglePause});
+  const RescueBreathsMenu({super.key, required this.roundNotifier, required this.togglePause, required this.openBreathsChecklist});
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +419,7 @@ class RescueBreathsMenu extends StatelessWidget {
                 width: 383,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Add start breaths functionality
+                    openBreathsChecklist();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromARGB(255, 255, 68, 65),
@@ -789,8 +816,9 @@ class PauseButton extends StatelessWidget {
 // region MARK: Call 911 Button
 class Call911Button extends StatelessWidget {
   final VoidCallback togglePause;
+  final bool isCounting;
 
-  const Call911Button({super.key, required this.togglePause});
+  const Call911Button({super.key, required this.togglePause, required this.isCounting});
 
   @override
   Widget build(BuildContext context) {
@@ -799,7 +827,9 @@ class Call911Button extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           print('Call 911 pressed');
-          togglePause();
+          if (isCounting) {
+            togglePause();
+          }
           Navigator.push(
             context,
             MaterialPageRoute(
