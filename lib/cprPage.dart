@@ -170,6 +170,7 @@ class _CPRPageState extends State<CPRPage> {
   }
   // endregion
 
+  // region Breath callback functions
   void _showBreathsMenu() {
     showDialog(
         context: context,
@@ -189,6 +190,7 @@ class _CPRPageState extends State<CPRPage> {
         }
     );
   }
+  // endregion
 
   @override
   Widget build(BuildContext context) {
@@ -372,9 +374,228 @@ class RescueBreathsChecklist extends StatefulWidget {
 }
 
 class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
+  bool button1 = false;
+  bool button2 = false;
+  bool button3 = false;
+  bool button4 = false;
+
+  void _toggleButton1() {
+    setState(() {
+      button1 = !button1;
+    });
+  }
+
+  void _toggleButton2() {
+    setState(() {
+      button2 = !button2;
+    });
+  }
+
+  void _toggleButton3() {
+    setState(() {
+      button3 = !button3;
+    });
+  }
+
+  void _toggleButton4() {
+    setState(() {
+      button4 = !button4;
+    });
+  }
+
+  bool _isAllChecked() {
+    return button1 && button2 && button3 && button4;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    const String button1Text = "Perform Head-Tilt, Chin-Lift Maneuver";
+    const String button2Text = "Pinch the casualty's nose cosed";
+    const String button3Text = "Form a complete seal over the casualty's mouth";
+    const String button4Text = "Give 2 breaths (1 sec each), watch chest rise/fall";
+
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Container(
+          width: 450,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: [
+              SizedBox(height: 100),
+              Text(
+                "Rescue Breaths",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 40,
+                  letterSpacing: -1,
+                )
+              ),
+              SizedBox(height: 30),
+              Padding(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: TextButton(
+                  onPressed: _toggleButton1,
+                  child: Row(
+                    children: [
+                      Icon(
+                        button1 ? Icons.check_box : Icons.check_box_outline_blank,
+                        size: 25,
+                        color: Colors.red,
+                      ),
+                      SizedBox(width: 15),
+                      Expanded(
+                        child: Text(
+                          button1Text,
+                          style: TextStyle(
+                            color: Colors.black,
+                          )
+                        ),
+                      )
+                    ]
+                  )
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: TextButton(
+                    onPressed: _toggleButton2,
+                    child: Row(
+                        children: [
+                          Icon(
+                            button2 ? Icons.check_box : Icons.check_box_outline_blank,
+                            size: 25,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: Text(
+                                button2Text,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                )
+                            ),
+                          )
+                        ]
+                    )
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: TextButton(
+                    onPressed: _toggleButton3,
+                    child: Row(
+                        children: [
+                          Icon(
+                            button3 ? Icons.check_box : Icons.check_box_outline_blank,
+                            size: 25,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: Text(
+                                button3Text,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                )
+                            ),
+                          )
+                        ]
+                    )
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: TextButton(
+                    onPressed: _toggleButton4,
+                    child: Row(
+                        children: [
+                          Icon(
+                            button4 ? Icons.check_box : Icons.check_box_outline_blank,
+                            size: 25,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: Text(
+                                button4Text,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                )
+                            ),
+                          )
+                        ]
+                    )
+                ),
+              ),
+              SizedBox(height: 350),
+              SizedBox(
+                  width: 383,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_isAllChecked()) {
+                        // TODO: Start guided breaths
+                      } else {
+                        null;
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isAllChecked() ? Color.fromARGB(255, 255, 68, 65) : Colors.grey,
+                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
+                      child: Text(
+                        "Begin Guided Breaths",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  )
+              ),
+              SizedBox(height: 15),
+              SizedBox(
+                  width: 70,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white70,
+                      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 0, bottom: 0),
+                      child: Text(
+                        "Back",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  )
+              ),
+            ]
+          )
+        ),
+      ),
+    );
   }
 }
 // endregion
