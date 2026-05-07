@@ -133,7 +133,7 @@ class _CPRPageState extends State<CPRPage> {
         totalBeatsNotifier.value++;
         beatsNotifier.value++;
         AudioPlayer().play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
-        if (beatsNotifier.value >= 30) {
+        if (beatsNotifier.value >= 1) {
           beatsNotifier.value = 0;
           roundNotifier.value++;
           _togglePause();
@@ -170,36 +170,16 @@ class _CPRPageState extends State<CPRPage> {
   }
   // endregion
 
-  // region MARK: Rescue Breaths
   void _showBreathsMenu() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white, // Gives the menu a visible background
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children:[
-              Text(
-                "Round 1 Complete",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                )
-              ),
-              SizedBox(height: 10),
-            ]
-          )
-        );
-      }
+    showDialog(
+        context: context,
+        barrierDismissible: false, // Prevents closing by tapping the dark background
+        barrierColor: Colors.black87,
+        builder: (BuildContext context) {
+          return RescueBreathsMenu(roundNotifier: roundNotifier);
+        }
     );
   }
-  // endregion
 
   @override
   Widget build(BuildContext context) {
@@ -372,6 +352,79 @@ class _CPRPageState extends State<CPRPage> {
     );
   }
 }
+
+// region MARK: Rescue Breaths
+class RescueBreathsMenu extends StatelessWidget {
+  final ValueNotifier<int> roundNotifier;
+
+  const RescueBreathsMenu({super.key, required this.roundNotifier});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child:
+        Column(
+            mainAxisSize: MainAxisSize.min, // Hugs the content tightly
+            children: [
+              Text(
+                  "Round ${roundNotifier.value - 1} Complete",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  )
+              ),
+              SizedBox(height: 7),
+              Text(
+                  "30 compressions given. Now provide 2 breaths.",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                  )
+              ),
+              SizedBox(height: 7),
+              SizedBox(
+                width: 383,
+
+                child: ElevatedButton(
+                  onPressed: () {
+                    // TODO: Add start breaths functionality
+                  },
+                  child: Text(
+                    "Start Breaths (Recommended)",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    )
+                  )
+                )
+              ),
+              SizedBox(height: 7),
+              SizedBox(
+                width: 383,
+
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Continue HandsOnly CPR",
+                    style: TextStyle(
+                      color: Colors.white,
+                    )
+                  )
+                )
+              )
+            ]
+        )
+    );
+  }
+}
+// endregion
 
 // region MARK: Stop CPR Section
 class StopCPR extends StatefulWidget {
