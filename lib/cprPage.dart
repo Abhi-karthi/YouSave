@@ -410,6 +410,7 @@ class RescueBreathsMenu extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   )
                 )
@@ -426,13 +427,13 @@ class RescueBreathsMenu extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    togglePause;
+                    togglePause();
                     Navigator.pop(context);
                   },
                   child: Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 5),
                     child: Text(
-                      "Continue HandsOnly CPR",
+                      "Continue Hands-Only CPR",
                       style: TextStyle(
                         color: Colors.white,
                       )
