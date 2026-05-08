@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'call911.dart';
 import 'dart:async';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 // region MARK: Countdown
 class CountdownOverlay extends StatefulWidget {
@@ -89,6 +91,13 @@ class _CPRPageState extends State<CPRPage> {
   final ValueNotifier<int> beatsNotifier = ValueNotifier(0);
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> breathsNotifier = ValueNotifier(1);
+  final ValueNotifier<String> reasonForStoppingNotifier = ValueNotifier("");
+  late String currentAge;
+
+  DateTime now = DateTime.now();
+
+  late String formattedTime = DateFormat('MMM d, yyyy HH:mm').format(now);
+
 
   bool counting = true;
   bool isDoneActive = false;
@@ -102,6 +111,8 @@ class _CPRPageState extends State<CPRPage> {
     super.initState();
 
     WakelockPlus.enable(); // 1. Turn it ON when the CPR Page opens
+    var appState = context.read<MyAppState>();
+    currentAge = appState.currentAge;
 
     AudioPlayer.global.setAudioContext(AudioContextConfig(
       respectSilence: false, // This forces it to play even if the phone is on silent!
@@ -218,13 +229,13 @@ class _CPRPageState extends State<CPRPage> {
   void _showSecondBreathStarter() {
     if (breathsNotifier.value < 3) {
       showDialog(
-          context: context,
-          barrierDismissible: false,
-          barrierColor: Colors.black87,
-          builder: (BuildContext context) {
-            breathsNotifier.value++;
-            return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
-          }
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.black87,
+        builder: (BuildContext context) {
+          breathsNotifier.value++;
+          return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
+        }
       );
     } else {
       _togglePause();
@@ -232,6 +243,23 @@ class _CPRPageState extends State<CPRPage> {
     }
   }
   // endregion
+
+  void _showCPRReport() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // MUST be true to allow custom heights!
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return CPRReport(
+          formattedTime: formattedTime,
+          rounds: roundNotifier,
+          totalCompressions: totalBeatsNotifier,
+          reasonForStopping: reasonForStoppingNotifier,
+          age: currentAge,
+        );
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -358,6 +386,7 @@ class _CPRPageState extends State<CPRPage> {
                         isDoneActive = isActive;
                       });
                     },
+                    reasonForStopping: reasonForStoppingNotifier,
                   )),
             ),
           ),
@@ -370,7 +399,8 @@ class _CPRPageState extends State<CPRPage> {
                   print('Stop CPR NOW');
                 } : null,
                 onLongPress: isDoneActive ? () {
-                  // TODO: Add route to next page
+                  if (counting) _togglePause();
+                  _showCPRReport();
                 } : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isDoneActive ? const Color.fromARGB(255, 255, 68, 65) : Colors.grey,
@@ -405,6 +435,164 @@ class _CPRPageState extends State<CPRPage> {
     );
   }
 }
+
+// region MARK: CPR Report
+class CPRReport extends StatefulWidget {
+  final String formattedTime;
+  final ValueNotifier<int> rounds;
+  final ValueNotifier<int> totalCompressions;
+  final ValueNotifier<String> reasonForStopping;
+  final String age;
+
+  const CPRReport({super.key, required this.formattedTime, required this.rounds, required this.totalCompressions, required this.reasonForStopping, required this.age});
+
+  @override
+  State<CPRReport> createState() => _CPRReportState();
+}
+
+class _CPRReportState extends State<CPRReport> {
+  @override
+  Widget build(BuildContext context) {
+    TextStyle reportTextStyle = TextStyle(
+      color: Colors.black,
+      fontSize: 14,
+      fontFamily: 'Courier',
+    );
+
+    String time = widget.formattedTime;
+    int rounds = widget.rounds.value;
+    int totalCompressions = widget.totalCompressions.value;
+    String reasonForStopping = widget.reasonForStopping.value;
+    String age = widget.age;
+
+    return Container(
+      // THE FIX: Force the container to be exactly 60% of the screen height
+      height: MediaQuery.of(context).size.height * 0.93,
+      width: MediaQuery.of(context).size.width * 1,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(children:[
+            SizedBox(width: 10),
+            TextButton(
+              onPressed: () { Navigator.popUntil(context, (route) => route.isFirst); },
+              child: Text(
+                "Done",
+                style: TextStyle(
+                  color: Colors.lightBlueAccent,
+                  fontSize: 15,
+                )
+              )
+            ),
+            Spacer(),
+          ]),
+          SizedBox(height: 7),
+          Text(
+            "CPR Report",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 33,
+              letterSpacing: -1,
+            )
+          ),
+          SizedBox(height: 40),
+          Container(
+            width: 330,
+            height: 200,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "CPR Incident Report",
+                  style: reportTextStyle,
+                ),
+                Text(
+                  "--------------------------"
+                ),
+                Text(
+                  "CPR Start Time: $time",
+                  style: reportTextStyle,
+                ),
+                Text(
+                  "Age Group of Victim: $age",
+                  style: reportTextStyle,
+                ),
+                Text(
+                  "Total Rounds Completed: $rounds",
+                  style: reportTextStyle,
+                ),
+                Text(
+                  "Total Compressions: $totalCompressions",
+                  style: reportTextStyle,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "Reason for Stopping CPR:",
+                  style: reportTextStyle,
+                ),
+                Text(
+                  reasonForStopping,
+                  style: reportTextStyle,
+                ),
+              ]
+            )
+          ),
+          SizedBox(height: 20),
+          SizedBox(
+            width: 330,
+            child: ElevatedButton(
+                onPressed: () async {
+                  // 1. Copy the text to the clipboard
+                  await Clipboard.setData(ClipboardData(text: "CPR Incident Report - CPR Start Time: $time, Age Group of Victim: $age, Total Rounds Completed: $rounds, Total Compressions: $totalCompressions, Reason for stopping CPR: $reasonForStopping"));
+
+                  // 2. Optional: Show a quick little notification at the bottom of the screen!
+                  HapticFeedback.lightImpact();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 247, 229, 224),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Row(children: [
+                  Spacer(),
+                  const Icon(
+                    Icons.copy,
+                    size: 15,
+                    color: Colors.red,
+                  ),
+                  SizedBox(width: 10),
+                  const Text(
+                      'Copy to Clipboard',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.red,
+                      )
+                  ),
+                  Spacer(),
+                ])
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// endregion
 
 // region MARK: Second Breath Starter
 class SecondBreathStarter extends StatelessWidget {
@@ -666,7 +854,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                   letterSpacing: -1,
                 )
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 40),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: TextButton(
@@ -691,6 +879,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                   )
                 ),
               ),
+              SizedBox(height: 10,),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: TextButton(
@@ -715,6 +904,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                     )
                 ),
               ),
+              SizedBox(height: 10,),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: TextButton(
@@ -739,6 +929,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                     )
                 ),
               ),
+              SizedBox(height: 10,),
               Padding(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: TextButton(
@@ -763,7 +954,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                     )
                 ),
               ),
-              SizedBox(height: 395),
+              SizedBox(height: 345),
               SizedBox(
                   width: 383,
                   child: ElevatedButton(
@@ -929,7 +1120,8 @@ class RescueBreathsMenu extends StatelessWidget {
 // region MARK: Stop CPR Section
 class StopCPR extends StatefulWidget {
   final ValueChanged<bool> onSelectionChanged;
-  const StopCPR({super.key, required this.onSelectionChanged});
+  final ValueNotifier<String> reasonForStopping;
+  const StopCPR({super.key, required this.onSelectionChanged, required this.reasonForStopping});
 
   @override
   State<StopCPR> createState() => _StopCPRState();
@@ -955,6 +1147,7 @@ class _StopCPRState extends State<StopCPR> {
       bool backOn = false;
       if (!personRegainedConsciousness) {
         backOn = true;
+        widget.reasonForStopping.value = "Person regained consciousness";
       }
       off();
       if (backOn) personRegainedConsciousness = true;
@@ -967,6 +1160,7 @@ class _StopCPRState extends State<StopCPR> {
       bool backOn = false;
       if (!EMSArrivedAndTookOver) {
         backOn = true;
+        widget.reasonForStopping.value = "EMS arrived and took over";
       }
       off();
       if (backOn) EMSArrivedAndTookOver = true;
@@ -979,6 +1173,7 @@ class _StopCPRState extends State<StopCPR> {
       bool backOn = false;
       if (!AEDInUseSwitchedCare) {
         backOn = true;
+        widget.reasonForStopping.value = "AED in use / switched care";
       }
       off();
       if (backOn) AEDInUseSwitchedCare = true;
@@ -991,6 +1186,7 @@ class _StopCPRState extends State<StopCPR> {
       bool backOn = false;
       if (!tooExhaustedToContinue) {
         backOn = true;
+        widget.reasonForStopping.value = "Too exhausted to continue";
       }
       off();
       if (backOn) tooExhaustedToContinue = true;
