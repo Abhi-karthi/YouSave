@@ -21,8 +21,24 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 flutter:
   uses-material-design: true
   assets:
     - assets/sounds/tick.mp3
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
+  remove_alpha_ios: true # This acts as a safety net against transparent backgrounds!
+
+flutter_native_splash:
+  color: "#ffffff" # The background color of the loading screen (white)
+  image: "assets/splash.png" # Your logo
+
+  # For iOS specifically:
+  ios: true
+  ios_content_mode: scaleAspectFit # Keeps your logo from stretching weirdly
