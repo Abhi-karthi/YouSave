@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'main.dart';
 import 'select_age.dart';
+import 'mainMenu.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -32,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       shape: CircleBorder(),
-                      padding: EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(1.0),
                       backgroundColor: Color.fromARGB(
                         255,
                         255,
@@ -43,9 +44,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       elevation: 0, // No shadow
                     ),
                     onPressed: () {
-                      print('pressed');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MainMenuPage()),
+                      );
                     },
-                    child: Icon(Icons.menu, size: 24.0),
+                    child: Icon(Icons.info, size: 24.0),
                   ),
                 ],
               ),
