@@ -88,6 +88,7 @@ class _CPRPageState extends State<CPRPage> {
   final ValueNotifier<int> totalBeatsNotifier = ValueNotifier(0);
   final ValueNotifier<int> beatsNotifier = ValueNotifier(0);
   final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<int> breathsNotifier = ValueNotifier(1);
 
   bool counting = true;
   bool isDoneActive = false;
@@ -197,7 +198,18 @@ class _CPRPageState extends State<CPRPage> {
       barrierDismissible: false,
       barrierColor: Colors.black87,
       builder: (BuildContext context) {
-        return RescueBreathsDialogue();
+        return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _firstBreathDialogue,);
+      }
+    );
+  }
+
+  void _firstBreathDialogue() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black87,
+      builder: (BuildContext context) {
+        return Placeholder();
       }
     );
   }
@@ -378,19 +390,24 @@ class _CPRPageState extends State<CPRPage> {
 
 // region MARK: Rescue Breaths Dialogue
 class RescueBreathsDialogue extends StatelessWidget {
-  const RescueBreathsDialogue({super.key});
+  final ValueNotifier<int> breathsNotifier;
+  final VoidCallback firstBreathDialogue;
+
+  const RescueBreathsDialogue({super.key, required this.breathsNotifier, required this.firstBreathDialogue});
 
   @override
   Widget build(BuildContext context) {
+    int currentBreath = breathsNotifier.value;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Column(
         children: [
-          const SizedBox(height: 280),
-          const Text(
-            "Ready for Breath 1",
-            style: TextStyle(
+          const SizedBox(height: 295),
+          Text(
+            "Ready for Breath $currentBreath",
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 28,
               color: Colors.white,
@@ -398,31 +415,32 @@ class RescueBreathsDialogue extends StatelessWidget {
           ),
           SizedBox(height: 20),
           SizedBox(
-              width: 383,
-              child: ElevatedButton(
-                  onPressed: () {
-
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 255, 68, 65),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+            width: 383,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                firstBreathDialogue();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 2, bottom: 2),
+                child: Text(
+                  "Deliver Breath $currentBreath",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.only(top: 2, bottom: 2),
-                    child: Text(
-                      "Deliver Breath 1",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
+                  textAlign: TextAlign.center,
+                ),
               )
+            )
           ),
         ]
       ),
