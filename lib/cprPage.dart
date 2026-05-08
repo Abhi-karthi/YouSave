@@ -205,31 +205,31 @@ class _CPRPageState extends State<CPRPage> {
   }
 
   void _showFirstBreathDialogue() {
-    if (breathsNotifier.value == 1 || breathsNotifier.value == 2) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.black87,
+        builder: (BuildContext context) {
+          return FirstBreathDialogue(onComplete: _showSecondBreathStarter,);
+        }
+    );
+  }
+
+  void _showSecondBreathStarter() {
+    if (breathsNotifier.value < 3) {
       showDialog(
           context: context,
           barrierDismissible: false,
           barrierColor: Colors.black87,
           builder: (BuildContext context) {
-            return FirstBreathDialogue(onComplete: _showSecondBreathStarter,);
+            breathsNotifier.value++;
+            return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
           }
       );
     } else {
       _togglePause();
       breathsNotifier.value = 1;
     }
-  }
-
-  void _showSecondBreathStarter() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black87,
-      builder: (BuildContext context) {
-        breathsNotifier.value++;
-        return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
-      }
-    );
   }
   // endregion
 
