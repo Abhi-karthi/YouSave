@@ -198,18 +198,36 @@ class _CPRPageState extends State<CPRPage> {
       barrierDismissible: false,
       barrierColor: Colors.black87,
       builder: (BuildContext context) {
+        breathsNotifier.value++;
         return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _showFirstBreathDialogue,);
       }
     );
   }
 
   void _showFirstBreathDialogue() {
+    if (breathsNotifier.value == 1 || breathsNotifier.value == 2) {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.black87,
+          builder: (BuildContext context) {
+            return FirstBreathDialogue(onComplete: _showSecondBreathStarter,);
+          }
+      );
+    } else {
+      _togglePause();
+      breathsNotifier.value = 1;
+    }
+  }
+
+  void _showSecondBreathStarter() {
     showDialog(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black87,
       builder: (BuildContext context) {
-        return FirstBreathDialogue();
+        breathsNotifier.value++;
+        return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
       }
     );
   }
@@ -388,41 +406,130 @@ class _CPRPageState extends State<CPRPage> {
   }
 }
 
-// region MARK: First Breath Dialogue
-class FirstBreathDialogue extends StatelessWidget {
-  const FirstBreathDialogue({super.key});
+// region MARK: Second Breath Starter
+class SecondBreathStarter extends StatelessWidget {
+  final VoidCallback onComplete;
+
+  const SecondBreathStarter({super.key, required this.onComplete});
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      child:
-        Column(children: [
-          SizedBox(height: 285),
-          Text(
-            "GIVE BREATH",
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 36,
-              fontWeight: FontWeight(800),
-              letterSpacing: -1.5,
-            )
-          ),
-          // SizedBox(height: 5),
-          Text(
-            "1 Second...",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-            )
+      child: Column(children: [
+        SizedBox(height: 260),
+        Text(
+          "Allow chest to fall.",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           )
-        ]
-      ),
+        ),
+        SizedBox(height: 12),
+        Text(
+          "Ready for Breath 2",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          )
+        ),
+        SizedBox(height: 15),
+        SizedBox(
+            width: 383,
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onComplete();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2, bottom: 2),
+                  child: Text(
+                    "Deliver Breath 2",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+            )
+        ),
+      ])
     );
   }
 }
 
+// endregion
+
+// region MARK: First Breath Dialogue
+class FirstBreathDialogue extends StatefulWidget {
+  final VoidCallback onComplete;
+
+  const FirstBreathDialogue({super.key, required this.onComplete});
+
+  @override
+  State<FirstBreathDialogue> createState() => _FirstBreathDialogueState();
+}
+
+class _FirstBreathDialogueState extends State<FirstBreathDialogue> {
+
+  @override
+  void initState() {
+    super.initState();
+    _startBreathTimer();
+  }
+
+  void _startBreathTimer() async {
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (mounted) {
+      Navigator.pop(context);
+      widget.onComplete();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+                "GIVE BREATH",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1.5,
+                )
+            ),
+            const SizedBox(height: 10),
+            const Text(
+                "1 Second...",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                )
+            )
+          ]
+      ),
+    );
+  }
+}
 // endregion
 
 // region MARK: Rescue Breaths Dialogue
@@ -434,7 +541,7 @@ class RescueBreathsDialogue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int currentBreath = breathsNotifier.value;
+    int currentBreath = breathsNotifier.value-1;
 
     return Dialog(
       backgroundColor: Colors.transparent,
