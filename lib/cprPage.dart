@@ -198,18 +198,18 @@ class _CPRPageState extends State<CPRPage> {
       barrierDismissible: false,
       barrierColor: Colors.black87,
       builder: (BuildContext context) {
-        return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _firstBreathDialogue,);
+        return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _showFirstBreathDialogue,);
       }
     );
   }
 
-  void _firstBreathDialogue() {
+  void _showFirstBreathDialogue() {
     showDialog(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black87,
       builder: (BuildContext context) {
-        return Placeholder();
+        return FirstBreathDialogue();
       }
     );
   }
@@ -387,6 +387,43 @@ class _CPRPageState extends State<CPRPage> {
     );
   }
 }
+
+// region MARK: First Breath Dialogue
+class FirstBreathDialogue extends StatelessWidget {
+  const FirstBreathDialogue({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child:
+        Column(children: [
+          SizedBox(height: 285),
+          Text(
+            "GIVE BREATH",
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 36,
+              fontWeight: FontWeight(800),
+              letterSpacing: -1.5,
+            )
+          ),
+          // SizedBox(height: 5),
+          Text(
+            "1 Second...",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+            )
+          )
+        ]
+      ),
+    );
+  }
+}
+
+// endregion
 
 // region MARK: Rescue Breaths Dialogue
 class RescueBreathsDialogue extends StatelessWidget {
