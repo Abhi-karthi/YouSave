@@ -63,6 +63,47 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         letterSpacing: -0.5,
                       )
                   ),
+                  const SizedBox(height: 20),
+
+                  // ---> NEW MEDICAL DISCLAIMER BOX <---
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              "MEDICAL DISCLAIMER",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red.shade700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "This app is for educational and reference purposes only. It is not a substitute for professional medical training, diagnosis, or emergency services. Always call 911 immediately in a medical emergency.",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black87,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // ---> END DISCLAIMER <---
+
                   const SizedBox(height: 24),
 
                   _buildInstructionItem(

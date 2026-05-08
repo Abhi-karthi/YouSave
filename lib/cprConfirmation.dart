@@ -88,7 +88,7 @@ class Call911 extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Call911Page(appState: MyAppState()),
+            builder: (context) => Call911Page(appState: appState),
           ),
         );
       },

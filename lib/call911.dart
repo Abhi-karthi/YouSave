@@ -10,7 +10,7 @@ class Call911Page extends StatelessWidget {
   // Function to trigger the native phone dialer safely
   Future<void> _launchCaller() async {
     // Using a mock number for safe testing on your iPhone
-    final Uri telUri = Uri(scheme: 'tel', path: '555-555-5555');
+    final Uri telUri = Uri(scheme: 'tel', path: '911');
     try {
       if (await canLaunchUrl(telUri)) {
         await launchUrl(telUri);

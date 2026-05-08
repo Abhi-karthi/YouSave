@@ -93,6 +93,7 @@ class _CPRPageState extends State<CPRPage> {
   final ValueNotifier<int> breathsNotifier = ValueNotifier(1);
   final ValueNotifier<String> reasonForStoppingNotifier = ValueNotifier("");
   late String currentAge;
+  final AudioPlayer _tickPlayer = AudioPlayer();
 
   DateTime now = DateTime.now();
 
@@ -144,7 +145,7 @@ class _CPRPageState extends State<CPRPage> {
       if (counting) {
         totalBeatsNotifier.value++;
         beatsNotifier.value++;
-        AudioPlayer().play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
+        _tickPlayer.play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
         if (beatsNotifier.value >= 30) {
           beatsNotifier.value = 0;
           roundNotifier.value++;
@@ -164,6 +165,7 @@ class _CPRPageState extends State<CPRPage> {
     totalBeatsNotifier.dispose();
     beatsNotifier.dispose();
     _scrollController.dispose();
+    _tickPlayer.dispose();
 
     super.dispose();
   }
@@ -204,12 +206,12 @@ class _CPRPageState extends State<CPRPage> {
   }
 
   void _showBreathsDialogue() {
+    breathsNotifier.value++;
     showDialog(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black87,
       builder: (BuildContext context) {
-        breathsNotifier.value++;
         return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _showFirstBreathDialogue,);
       }
     );
@@ -282,7 +284,7 @@ class _CPRPageState extends State<CPRPage> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(vertical: 20),
         children: [
-          Center(child: Call911Button(togglePause: _togglePause, isCounting: counting)),
+          Center(child: Call911Button(togglePause: _togglePause, isCounting: counting, appState: appState)),
 
           const SizedBox(height: 20),
 
@@ -829,7 +831,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
   @override
   Widget build(BuildContext context) {
     const String button1Text = "Perform Head-Tilt, Chin-Lift Maneuver";
-    const String button2Text = "Pinch the casualty's nose cosed";
+    const String button2Text = "Pinch the casualty's nose closed";
     const String button3Text = "Form a complete seal over the casualty's mouth";
     const String button4Text = "Give 2 breaths (1 sec each), watch chest rise/fall";
 
@@ -1464,8 +1466,9 @@ class PauseButton extends StatelessWidget {
 class Call911Button extends StatelessWidget {
   final VoidCallback togglePause;
   final bool isCounting;
+  final MyAppState appState;
 
-  const Call911Button({super.key, required this.togglePause, required this.isCounting});
+  const Call911Button({super.key, required this.togglePause, required this.isCounting, required this.appState});
 
   @override
   Widget build(BuildContext context) {
@@ -1480,7 +1483,7 @@ class Call911Button extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Call911Page(appState: MyAppState()),
+              builder: (context) => Call911Page(appState: appState),
             ),
           );
         },
