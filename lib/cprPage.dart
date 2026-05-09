@@ -747,30 +747,38 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: SingleChildScrollView( // Allows scrolling on tiny screens!
+            child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 30),
                 child: Column(
-                    mainAxisSize: MainAxisSize.min, // Eliminates massive empty space
                     children: [
-                      SizedBox(height: MediaQuery.of(context).size.height*0.1),
-                      const Text(
-                          "Rescue Breaths",
-                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 40, letterSpacing: -1)
+                      // Scrollable checklist content at the top
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                                const Text(
+                                    "Rescue Breaths",
+                                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 40, letterSpacing: -1)
+                                ),
+                                const SizedBox(height: 30),
+                                _buildChecklistRow(button1, "Perform Head-Tilt, Chin-Lift Maneuver", _toggleButton1),
+                                const SizedBox(height: 10),
+                                _buildChecklistRow(button2, "Pinch the casualty's nose closed", _toggleButton2),
+                                const SizedBox(height: 10),
+                                _buildChecklistRow(button3, "Form a complete seal over the casualty's mouth", _toggleButton3),
+                                const SizedBox(height: 10),
+                                _buildChecklistRow(button4, "Give 2 breaths (1 sec each), watch chest rise/fall", _toggleButton4),
+                              ]
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 30),
-                      _buildChecklistRow(button1, "Perform Head-Tilt, Chin-Lift Maneuver", _toggleButton1),
-                      const SizedBox(height: 10),
-                      _buildChecklistRow(button2, "Pinch the casualty's nose closed", _toggleButton2),
-                      const SizedBox(height: 10),
-                      _buildChecklistRow(button3, "Form a complete seal over the casualty's mouth", _toggleButton3),
-                      const SizedBox(height: 10),
-                      _buildChecklistRow(button4, "Give 2 breaths (1 sec each), watch chest rise/fall", _toggleButton4),
 
-                      Spacer(),
-
+                      // Buttons pinned to the bottom 🎯
                       SizedBox(
-                          width: 383,
+                          width: MediaQuery.of(context).size.width * 0.82,
                           child: ElevatedButton(
                               onPressed: () {
                                 if (_isAllChecked()) {
@@ -795,7 +803,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                       ),
                       const SizedBox(height: 15),
                       SizedBox(
-                          width: 70,
+                          width: MediaQuery.of(context).size.width * 0.16,
                           child: ElevatedButton(
                             onPressed: () => Navigator.pop(context),
                             style: ElevatedButton.styleFrom(
@@ -806,7 +814,7 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
                             child: const Text("Back", style: TextStyle(color: Colors.grey, fontSize: 14), textAlign: TextAlign.center),
                           )
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 10),
                     ]
                 ),
               ),
