@@ -1,12 +1,9 @@
 import 'dart:ui';
 
-import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
 
 import 'main.dart';
-import 'homepage.dart';
 import 'cprConfirmation.dart';
 
 class SelectAgePage extends StatelessWidget {
@@ -14,13 +11,13 @@ class SelectAgePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
     return Scaffold(
-      appBar: AppBar(title: Text('Age Selection')),
-      body: Center(
+      appBar: AppBar(title: const Text('Age Selection')),
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Spacer(flex: 2), // Adds flexible top padding
             Text(
               "Select Age:",
               style: TextStyle(
@@ -29,13 +26,13 @@ class SelectAgePage extends StatelessWidget {
                 fontSize: 30,
               ),
             ),
-            SizedBox(height: 50),
+            Spacer(flex: 1),
             AdultElevatedButton(),
-            SizedBox(height: 60),
+            Spacer(flex: 1),
             ChildElevatedButton(),
-            SizedBox(height: 60),
+            Spacer(flex: 1),
             InfantElevatedButton(),
-            SizedBox(height: 40),
+            Spacer(flex: 2), // Adds flexible bottom padding
           ],
         ),
       ),
@@ -54,24 +51,20 @@ class AdultElevatedButton extends StatelessWidget {
         appState.setCurrentAge('Adult');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+          MaterialPageRoute(builder: (context) => const CPRConfirmationPage()),
         );
-        print('Adult');
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromARGB(255, 255, 61, 61),
+        backgroundColor: const Color.fromARGB(255, 255, 61, 61),
         foregroundColor: Colors.white,
         shape: const CircleBorder(),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(50.0),
+      child: const Padding(
+        padding: EdgeInsets.all(50.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Adult',
-              style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
-            ),
+            Text('Adult', style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text('Puberty & Above', style: TextStyle(fontSize: 12.0)),
           ],
@@ -92,24 +85,20 @@ class ChildElevatedButton extends StatelessWidget {
         appState.setCurrentAge('Child');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+          MaterialPageRoute(builder: (context) => const CPRConfirmationPage()),
         );
-        print('Child');
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromARGB(255, 255, 61, 61),
+        backgroundColor: const Color.fromARGB(255, 255, 61, 61),
         foregroundColor: Colors.white,
         shape: const CircleBorder(),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(50.0),
+      child: const Padding(
+        padding: EdgeInsets.all(50.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Child',
-              style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
-            ),
+            Text('Child', style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text('Below Puberty', style: TextStyle(fontSize: 12.0)),
           ],
@@ -130,24 +119,20 @@ class InfantElevatedButton extends StatelessWidget {
         appState.setCurrentAge('Infant');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CPRConfirmationPage()),
+          MaterialPageRoute(builder: (context) => const CPRConfirmationPage()),
         );
-        print('Infant');
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromARGB(255, 255, 61, 61),
+        backgroundColor: const Color.fromARGB(255, 255, 61, 61),
         foregroundColor: Colors.white,
         shape: const CircleBorder(),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(50.0),
+      child: const Padding(
+        padding: EdgeInsets.all(50.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Infant',
-              style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
-            ),
+            Text('Infant', style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text('< 1 year', style: TextStyle(fontSize: 12.0)),
           ],

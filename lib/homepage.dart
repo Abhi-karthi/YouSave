@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
 
 import 'main.dart';
 import 'select_age.dart';
@@ -29,31 +28,29 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Row(
                 children: [
-                  SizedBox(width: 15.0),
+                  const SizedBox(width: 15.0),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      shape: CircleBorder(),
-                      padding: EdgeInsets.all(1.0),
-                      backgroundColor: Color.fromARGB(
-                        255,
-                        255,
-                        71,
-                        71,
-                      ), // Light red background
-                      foregroundColor: Colors.white, // White icon color
-                      elevation: 0, // No shadow
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(1.0),
+                      backgroundColor: const Color.fromARGB(255, 255, 71, 71),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
                     ),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MainMenuPage()),
+                        MaterialPageRoute(builder: (context) => const MainMenuPage()),
                       );
                     },
-                    child: Icon(Icons.info, size: 24.0),
+                    child: const Icon(Icons.info, size: 24.0),
                   ),
                 ],
               ),
-              Text(
+
+              const Spacer(flex: 1), // Dynamically pushes the title down
+
+              const Text(
                 'YOU SAVE',
                 style: TextStyle(
                   color: Color(0xFFE53935),
@@ -62,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   letterSpacing: -0.3,
                 ),
               ),
-              Text(
+              const Text(
                 'Every Beat Counts',
                 style: TextStyle(
                   color: Color(0xFFE53935),
@@ -71,7 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 170),
+
+              const Spacer(flex: 2), // The flexible spring! Replaces the 170 SizedBox
 
               GestureDetector(
                 onTapDown: (_) => setState(() => _isPressed = true),
@@ -79,26 +77,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() => _isPressed = false);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SelectAgePage()),
+                    MaterialPageRoute(builder: (context) => const SelectAgePage()),
                   );
                 },
                 onTapCancel: () => setState(() => _isPressed = false),
                 child: Column(
                   children: [
                     AnimatedScale(
-                      scale: _isPressed ? 0.92 : 1.0, // Shrinks to 92% size
+                      scale: _isPressed ? 0.92 : 1.0,
                       duration: const Duration(milliseconds: 100),
                       curve: Curves.easeOutCubic,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Your heart shape code
                           const Icon(
                             Icons.favorite,
                             color: Color.fromARGB(255, 239, 59, 59),
                             size: 350,
                           ),
-                          // Your ECG Painter code
                           SizedBox(
                             width: 93,
                             height: 170,
@@ -107,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-                    Text(
+                    const Text(
                       'CARDIAC ARREST',
                       style: TextStyle(
                         fontSize: 24.0,
@@ -118,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
+              const Spacer(flex: 3), // Pushes the heart up slightly from the bottom border
             ],
           ),
         ),
@@ -130,8 +127,7 @@ class ECGLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors
-          .white // White line to contrast with your red heart
+      ..color = Colors.white
       ..strokeWidth = 7
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -141,21 +137,11 @@ class ECGLinesPainter extends CustomPainter {
     double h = size.height;
     double mid = h / 2;
 
-    // Starting Baseline
     path.moveTo(w * 0.1, mid);
-    // path.lineTo(w * 0.1, mid);
-
-    // P-Wave (Small bump)
-
-    // QRS Complex (The big sharp spike)
-    path.lineTo(w * 0.37, mid); // Q (small dip)
-    path.lineTo(w * 0.47, mid - h * 0.3); // R (big peak)
-    path.lineTo(w * 0.52, mid + h * 0.2); // S (dip below baseline)
+    path.lineTo(w * 0.37, mid);
+    path.lineTo(w * 0.47, mid - h * 0.3);
+    path.lineTo(w * 0.52, mid + h * 0.2);
     path.lineTo(w * 0.63, mid);
-
-    // T-Wave (Medium bump)
-
-    // Ending Baseline
     path.lineTo(w * 0.9, mid);
 
     canvas.drawPath(path, paint);

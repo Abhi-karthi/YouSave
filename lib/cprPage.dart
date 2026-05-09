@@ -1,21 +1,15 @@
 import 'dart:ui';
 
-import 'package:english_words/english_words.dart';
-import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 import 'main.dart';
-import 'homepage.dart';
-import 'select_age.dart';
-import 'cprConfirmation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'call911.dart';
 import 'dart:async';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 // region MARK: Countdown
@@ -29,44 +23,38 @@ class CountdownOverlay extends StatefulWidget {
 }
 
 class _CountdownOverlayState extends State<CountdownOverlay> {
-  int count = 2; // Starts at 2 seconds
+  int count = 2;
 
   @override
   void initState() {
     super.initState();
-
     _startCountdown();
   }
 
   void _startCountdown() async {
-    // Loop to handle the countdown
     while (count > 0) {
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
       if (mounted) {
         setState(() {
           count--;
         });
       }
     }
-
-    // Optional: wait a split second on "0" or "GO!" before closing
-    await Future.delayed(Duration(milliseconds: 500));
-
+    await Future.delayed(const Duration(milliseconds: 500));
     if (mounted) {
-      widget.onCountdownComplete(); // Tell the parent we are done!
+      widget.onCountdownComplete();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // A transparent dialog lets the gray barrier show through behind the text
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Center(
         child: Text(
           count > 0 ? '$count' : 'GO!',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 120,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -80,7 +68,6 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
 
 class CPRPage extends StatefulWidget {
   @override
-  // ignore: library_private_types_in_public_api
   _CPRPageState createState() => _CPRPageState();
 }
 
@@ -102,7 +89,6 @@ class _CPRPageState extends State<CPRPage> {
 
   bool counting = true;
   bool isDoneActive = false;
-  final GlobalKey<_StopCPRState> childKey = GlobalKey();
 
   Timer? _timer;
 
@@ -111,12 +97,12 @@ class _CPRPageState extends State<CPRPage> {
   void initState() {
     super.initState();
 
-    WakelockPlus.enable(); // 1. Turn it ON when the CPR Page opens
+    WakelockPlus.enable();
     var appState = context.read<MyAppState>();
     currentAge = appState.currentAge;
 
     AudioPlayer.global.setAudioContext(AudioContextConfig(
-      respectSilence: false, // This forces it to play even if the phone is on silent!
+      respectSilence: false,
     ).build());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -127,12 +113,12 @@ class _CPRPageState extends State<CPRPage> {
   void _showCountdownDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevents user from tapping outside to dismiss it early
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return CountdownOverlay(
           onCountdownComplete: () {
-            Navigator.of(context).pop(); // 1. Close the dialog
-            _startTimer();               // 2. Start your main CPR timer
+            Navigator.of(context).pop();
+            _startTimer();
           },
         );
       },
@@ -140,12 +126,17 @@ class _CPRPageState extends State<CPRPage> {
   }
 
   void _startTimer() {
-    // Your exact timer logic from before goes here!
-    _timer = Timer.periodic(Duration(milliseconds: 600), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 600), (timer) {
       if (counting) {
         totalBeatsNotifier.value++;
         beatsNotifier.value++;
-        _tickPlayer.play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
+
+        // ---> THE AUDIO BUG FIX <---
+        // Forcibly clear the previous sound handle so the hardware never skips!
+        _tickPlayer.stop().then((_) {
+          _tickPlayer.play(AssetSource('sounds/tick.mp3'), mode: PlayerMode.lowLatency);
+        });
+
         if (beatsNotifier.value >= 30) {
           beatsNotifier.value = 0;
           roundNotifier.value++;
@@ -180,7 +171,6 @@ class _CPRPageState extends State<CPRPage> {
     roundNotifier.value = 1;
     totalBeatsNotifier.value = 0;
     beatsNotifier.value = 0;
-    // Optional: counting = true; if you want it to auto-resume on reset
   }
   // endregion
 
@@ -188,7 +178,7 @@ class _CPRPageState extends State<CPRPage> {
   void _showBreathsMenu() {
     showDialog(
         context: context,
-        barrierDismissible: false, // Prevents closing by tapping the dark background
+        barrierDismissible: false,
         barrierColor: Colors.black87,
         builder: (BuildContext context) {
           return RescueBreathsMenu(roundNotifier: roundNotifier, togglePause: _togglePause, openBreathsChecklist: _showBreathsChecklist,);
@@ -208,12 +198,12 @@ class _CPRPageState extends State<CPRPage> {
   void _showBreathsDialogue() {
     breathsNotifier.value++;
     showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black87,
-      builder: (BuildContext context) {
-        return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _showFirstBreathDialogue,);
-      }
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.black87,
+        builder: (BuildContext context) {
+          return RescueBreathsDialogue(breathsNotifier: breathsNotifier, firstBreathDialogue: _showFirstBreathDialogue,);
+        }
     );
   }
 
@@ -231,13 +221,13 @@ class _CPRPageState extends State<CPRPage> {
   void _showSecondBreathStarter() {
     if (breathsNotifier.value < 3) {
       showDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: Colors.black87,
-        builder: (BuildContext context) {
-          breathsNotifier.value++;
-          return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
-        }
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.black87,
+          builder: (BuildContext context) {
+            breathsNotifier.value++;
+            return SecondBreathStarter(onComplete: _showFirstBreathDialogue);
+          }
       );
     } else {
       _togglePause();
@@ -248,18 +238,18 @@ class _CPRPageState extends State<CPRPage> {
 
   void _showCPRReport() {
     showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // MUST be true to allow custom heights!
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return CPRReport(
-          formattedTime: formattedTime,
-          rounds: roundNotifier,
-          totalCompressions: totalBeatsNotifier,
-          reasonForStopping: reasonForStoppingNotifier,
-          age: currentAge,
-        );
-      }
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return CPRReport(
+            formattedTime: formattedTime,
+            rounds: roundNotifier,
+            totalCompressions: totalBeatsNotifier,
+            reasonForStopping: reasonForStoppingNotifier,
+            age: currentAge,
+          );
+        }
     );
   }
 
@@ -267,18 +257,18 @@ class _CPRPageState extends State<CPRPage> {
   Widget build(BuildContext context) {
     var appState = context.read<MyAppState>();
     var currAge = appState.currentAge;
-    double instructionsHeight;
-    if (currAge == "Infant") {
-      instructionsHeight = 360;
-    } else if (currAge == "Child") {
-      instructionsHeight = 300;
-    } else {
-      instructionsHeight = 320;
-    }
+    // double instructionsHeight;
+    // if (currAge == "Infant") {
+    //   instructionsHeight = (360/2796) * MediaQuery.of(context).size.height;
+    // } else if (currAge == "Child") {
+    //   // instructionsHeight = (300/2796) * MediaQuery.of(context).size.height;
+    //   instructionsHeight = MediaQuery.of(context).size.height * 0.3;
+    // } else {
+    //   instructionsHeight = (320/2796) * MediaQuery.of(context).size.height;
+    // }
 
     return Scaffold(
       appBar: AppBar(title: const Text('CPR Instructions')),
-      // 1. REPLACED SingleChildScrollView with a robust ListView
       body: ListView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
@@ -323,7 +313,7 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          SizedBox(height: 10),
+          SizedBox(height: MediaQuery.of(context).size.height*0.05),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -344,7 +334,6 @@ class _CPRPageState extends State<CPRPage> {
             child: RepaintBoundary(
               child: Container(
                   width: 350,
-                  height: instructionsHeight,
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
@@ -367,7 +356,6 @@ class _CPRPageState extends State<CPRPage> {
             child: RepaintBoundary(
               child: Container(
                   width: 350,
-                  height: 300,
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.symmetric(vertical: 40),
                   decoration: BoxDecoration(
@@ -397,37 +385,37 @@ class _CPRPageState extends State<CPRPage> {
             child: SizedBox(
               width: 383,
               child: ElevatedButton(
-                onPressed: isDoneActive ? () {
-                  print('Stop CPR NOW');
-                } : null,
-                onLongPress: isDoneActive ? () {
-                  if (counting) _togglePause();
-                  _showCPRReport();
-                } : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDoneActive ? const Color.fromARGB(255, 255, 68, 65) : Colors.grey,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Column(children: [
-                  const Text(
-                    'Done',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  onPressed: isDoneActive ? () {
+                    print('Stop CPR NOW');
+                  } : null,
+                  onLongPress: isDoneActive ? () {
+                    if (counting) _togglePause();
+                    _showCPRReport();
+                  } : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDoneActive ? const Color.fromARGB(255, 255, 68, 65) : Colors.grey,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const Text(
-                    '(Press & hold)',
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Colors.white,
+                  child: const Column(children: [
+                    Text(
+                      'Done',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                        '(Press & hold)',
+                        style: TextStyle(
+                          fontSize: 8,
+                          color: Colors.white,
+                        )
                     )
-                  )
-                ])
+                  ])
               ),
             ),
           ),
@@ -455,7 +443,7 @@ class CPRReport extends StatefulWidget {
 class _CPRReportState extends State<CPRReport> {
   @override
   Widget build(BuildContext context) {
-    TextStyle reportTextStyle = TextStyle(
+    const TextStyle reportTextStyle = TextStyle(
       color: Colors.black,
       fontSize: 14,
       fontFamily: 'Courier',
@@ -468,9 +456,8 @@ class _CPRReportState extends State<CPRReport> {
     String age = widget.age;
 
     return Container(
-      // THE FIX: Force the container to be exactly 60% of the screen height
       height: MediaQuery.of(context).size.height * 0.93,
-      width: MediaQuery.of(context).size.width * 1,
+      width: double.infinity,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -481,85 +468,59 @@ class _CPRReportState extends State<CPRReport> {
       child: Column(
         children: [
           Row(children:[
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             TextButton(
-              onPressed: () { Navigator.popUntil(context, (route) => route.isFirst); },
-              child: Text(
-                "Done",
-                style: TextStyle(
-                  color: Colors.lightBlueAccent,
-                  fontSize: 15,
+                onPressed: () { Navigator.popUntil(context, (route) => route.isFirst); },
+                child: const Text(
+                    "Done",
+                    style: TextStyle(
+                      color: Colors.lightBlueAccent,
+                      fontSize: 15,
+                    )
                 )
-              )
             ),
-            Spacer(),
+            const Spacer(),
           ]),
-          SizedBox(height: 7),
-          Text(
-            "CPR Report",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 33,
-              letterSpacing: -1,
-            )
+          const SizedBox(height: 7),
+          const Text(
+              "CPR Report",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 33,
+                letterSpacing: -1,
+              )
           ),
-          SizedBox(height: 40),
+          const SizedBox(height: 40),
           Container(
-            width: 330,
-            height: 200,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "CPR Incident Report",
-                  style: reportTextStyle,
-                ),
-                Text(
-                  "--------------------------"
-                ),
-                Text(
-                  "CPR Start Time: $time",
-                  style: reportTextStyle,
-                ),
-                Text(
-                  "Age Group of Victim: $age",
-                  style: reportTextStyle,
-                ),
-                Text(
-                  "Total Rounds Completed: $rounds",
-                  style: reportTextStyle,
-                ),
-                Text(
-                  "Total Compressions: $totalCompressions",
-                  style: reportTextStyle,
-                ),
-                SizedBox(height: 10),
-                Text(
-                  "Reason for Stopping CPR:",
-                  style: reportTextStyle,
-                ),
-                Text(
-                  reasonForStopping,
-                  style: reportTextStyle,
-                ),
-              ]
-            )
+              width: 330,
+              padding: const EdgeInsets.all(15), // Let the container hug the text naturally
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min, // Hugs content perfectly
+                  children: [
+                    const Text("CPR Incident Report", style: reportTextStyle),
+                    const Text("--------------------------", style: reportTextStyle),
+                    Text("CPR Start Time: $time", style: reportTextStyle),
+                    Text("Age Group of Victim: $age", style: reportTextStyle),
+                    Text("Total Rounds Completed: $rounds", style: reportTextStyle),
+                    Text("Total Compressions: $totalCompressions", style: reportTextStyle),
+                    const SizedBox(height: 10),
+                    const Text("Reason for Stopping CPR:", style: reportTextStyle),
+                    Text(reasonForStopping, style: reportTextStyle),
+                  ]
+              )
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           SizedBox(
             width: 330,
             child: ElevatedButton(
                 onPressed: () async {
-                  // 1. Copy the text to the clipboard
                   await Clipboard.setData(ClipboardData(text: "CPR Incident Report - CPR Start Time: $time, Age Group of Victim: $age, Total Rounds Completed: $rounds, Total Compressions: $totalCompressions, Reason for stopping CPR: $reasonForStopping"));
-
-                  // 2. Optional: Show a quick little notification at the bottom of the screen!
                   HapticFeedback.lightImpact();
                 },
                 style: ElevatedButton.styleFrom(
@@ -569,21 +530,11 @@ class _CPRReportState extends State<CPRReport> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Row(children: [
+                child: const Row(children: [
                   Spacer(),
-                  const Icon(
-                    Icons.copy,
-                    size: 15,
-                    color: Colors.red,
-                  ),
+                  Icon(Icons.copy, size: 15, color: Colors.red),
                   SizedBox(width: 10),
-                  const Text(
-                      'Copy to Clipboard',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.red,
-                      )
-                  ),
+                  Text('Copy to Clipboard', style: TextStyle(fontSize: 11, color: Colors.red)),
                   Spacer(),
                 ])
             ),
@@ -596,6 +547,9 @@ class _CPRReportState extends State<CPRReport> {
 
 // endregion
 
+// ---> THE UI DIALOG FIXES <---
+// Removed all giant SizedBoxes and used mainAxisSize: MainAxisSize.min to instantly center!
+
 // region MARK: Second Breath Starter
 class SecondBreathStarter extends StatelessWidget {
   final VoidCallback onComplete;
@@ -605,57 +559,44 @@ class SecondBreathStarter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      child: Column(children: [
-        SizedBox(height: 260),
-        Text(
-          "Allow chest to fall.",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          )
-        ),
-        SizedBox(height: 12),
-        Text(
-          "Ready for Breath 2",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          )
-        ),
-        SizedBox(height: 15),
-        SizedBox(
-            width: 383,
-            child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  onComplete();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 255, 68, 65),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 2, bottom: 2),
-                  child: Text(
-                    "Deliver Breath 2",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-            )
-        ),
-      ])
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Column(
+            mainAxisSize: MainAxisSize.min, // Instantly centers the content!
+            children: [
+              const Text(
+                  "Allow chest to fall.",
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                  "Ready for Breath 2",
+                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                  width: 383,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        onComplete();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 2),
+                        child: Text(
+                          "Deliver Breath 2",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                  )
+              ),
+            ])
     );
   }
 }
@@ -681,9 +622,7 @@ class _FirstBreathDialogueState extends State<FirstBreathDialogue> {
   }
 
   void _startBreathTimer() async {
-
     await Future.delayed(const Duration(seconds: 1));
-
     if (mounted) {
       Navigator.pop(context);
       widget.onComplete();
@@ -692,13 +631,13 @@ class _FirstBreathDialogueState extends State<FirstBreathDialogue> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    return const Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
                 "GIVE BREATH",
                 style: TextStyle(
                   color: Colors.red,
@@ -707,14 +646,8 @@ class _FirstBreathDialogueState extends State<FirstBreathDialogue> {
                   letterSpacing: -1.5,
                 )
             ),
-            const SizedBox(height: 10),
-            const Text(
-                "1 Second...",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                )
-            )
+            SizedBox(height: 10),
+            Text("1 Second...", style: TextStyle(color: Colors.white, fontSize: 24))
           ]
       ),
     );
@@ -737,46 +670,36 @@ class RescueBreathsDialogue extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Column(
-        children: [
-          const SizedBox(height: 295),
-          Text(
-            "Ready for Breath $currentBreath",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 28,
-              color: Colors.white,
-            )
-          ),
-          SizedBox(height: 20),
-          SizedBox(
-            width: 383,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                firstBreathDialogue();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 255, 68, 65),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 2, bottom: 2),
-                child: Text(
-                  "Deliver Breath $currentBreath",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              )
-            )
-          ),
-        ]
+          mainAxisSize: MainAxisSize.min, // Hugs content perfectly
+          children: [
+            Text(
+                "Ready for Breath $currentBreath",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+                width: 383,
+                child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      firstBreathDialogue();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Text(
+                        "Deliver Breath $currentBreath",
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                )
+            ),
+          ]
       ),
     );
   }
@@ -800,29 +723,10 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
   bool button3 = false;
   bool button4 = false;
 
-  void _toggleButton1() {
-    setState(() {
-      button1 = !button1;
-    });
-  }
-
-  void _toggleButton2() {
-    setState(() {
-      button2 = !button2;
-    });
-  }
-
-  void _toggleButton3() {
-    setState(() {
-      button3 = !button3;
-    });
-  }
-
-  void _toggleButton4() {
-    setState(() {
-      button4 = !button4;
-    });
-  }
+  void _toggleButton1() => setState(() => button1 = !button1);
+  void _toggleButton2() => setState(() => button2 = !button2);
+  void _toggleButton3() => setState(() => button3 = !button3);
+  void _toggleButton4() => setState(() => button4 = !button4);
 
   bool _isAllChecked() {
     return button1 && button2 && button3 && button4;
@@ -830,193 +734,97 @@ class _RescueBreathsChecklistState extends State<RescueBreathsChecklist> {
 
   @override
   Widget build(BuildContext context) {
-    const String button1Text = "Perform Head-Tilt, Chin-Lift Maneuver";
-    const String button2Text = "Pinch the casualty's nose closed";
-    const String button3Text = "Form a complete seal over the casualty's mouth";
-    const String button4Text = "Give 2 breaths (1 sec each), watch chest rise/fall";
-
     return Material(
       color: Colors.transparent,
       child: Center(
         child: Container(
-          width: 450,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            children: [
-              SizedBox(height: 75),
-              Text(
-                "Rescue Breaths",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 40,
-                  letterSpacing: -1,
-                )
-              ),
-              SizedBox(height: 40),
-              Padding(
-                padding: EdgeInsets.only(left: 30, right: 30),
-                child: TextButton(
-                  onPressed: _toggleButton1,
-                  child: Row(
+            width: 450,
+            height: MediaQuery.of(context).size.height * 1,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SingleChildScrollView( // Allows scrolling on tiny screens!
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 30),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min, // Eliminates massive empty space
                     children: [
-                      Icon(
-                        button1 ? Icons.check_box : Icons.check_box_outline_blank,
-                        size: 25,
-                        color: Colors.red,
+                      SizedBox(height: MediaQuery.of(context).size.height*0.1),
+                      const Text(
+                          "Rescue Breaths",
+                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 40, letterSpacing: -1)
                       ),
-                      SizedBox(width: 15),
-                      Expanded(
-                        child: Text(
-                          button1Text,
-                          style: TextStyle(
-                            color: Colors.black,
+                      const SizedBox(height: 30),
+                      _buildChecklistRow(button1, "Perform Head-Tilt, Chin-Lift Maneuver", _toggleButton1),
+                      const SizedBox(height: 10),
+                      _buildChecklistRow(button2, "Pinch the casualty's nose closed", _toggleButton2),
+                      const SizedBox(height: 10),
+                      _buildChecklistRow(button3, "Form a complete seal over the casualty's mouth", _toggleButton3),
+                      const SizedBox(height: 10),
+                      _buildChecklistRow(button4, "Give 2 breaths (1 sec each), watch chest rise/fall", _toggleButton4),
+
+                      Spacer(),
+
+                      SizedBox(
+                          width: 383,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                if (_isAllChecked()) {
+                                  Navigator.of(context)..pop()..pop();
+                                  widget.showRescueBreathsDialogue();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isAllChecked() ? const Color.fromARGB(255, 255, 68, 65) : Colors.grey,
+                                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                child: Text(
+                                  "Begin Guided Breaths",
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
                           )
-                        ),
-                      )
+                      ),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                          width: 70,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white70,
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text("Back", style: TextStyle(color: Colors.grey, fontSize: 14), textAlign: TextAlign.center),
+                          )
+                      ),
+                      const SizedBox(height: 30),
                     ]
-                  )
                 ),
               ),
-              SizedBox(height: 10,),
-              Padding(
-                padding: EdgeInsets.only(left: 30, right: 30),
-                child: TextButton(
-                    onPressed: _toggleButton2,
-                    child: Row(
-                        children: [
-                          Icon(
-                            button2 ? Icons.check_box : Icons.check_box_outline_blank,
-                            size: 25,
-                            color: Colors.red,
-                          ),
-                          SizedBox(width: 15),
-                          Expanded(
-                            child: Text(
-                                button2Text,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                )
-                            ),
-                          )
-                        ]
-                    )
-                ),
-              ),
-              SizedBox(height: 10,),
-              Padding(
-                padding: EdgeInsets.only(left: 30, right: 30),
-                child: TextButton(
-                    onPressed: _toggleButton3,
-                    child: Row(
-                        children: [
-                          Icon(
-                            button3 ? Icons.check_box : Icons.check_box_outline_blank,
-                            size: 25,
-                            color: Colors.red,
-                          ),
-                          SizedBox(width: 15),
-                          Expanded(
-                            child: Text(
-                                button3Text,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                )
-                            ),
-                          )
-                        ]
-                    )
-                ),
-              ),
-              SizedBox(height: 10,),
-              Padding(
-                padding: EdgeInsets.only(left: 30, right: 30),
-                child: TextButton(
-                    onPressed: _toggleButton4,
-                    child: Row(
-                        children: [
-                          Icon(
-                            button4 ? Icons.check_box : Icons.check_box_outline_blank,
-                            size: 25,
-                            color: Colors.red,
-                          ),
-                          SizedBox(width: 15),
-                          Expanded(
-                            child: Text(
-                                button4Text,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                )
-                            ),
-                          )
-                        ]
-                    )
-                ),
-              ),
-              SizedBox(height: 345),
-              SizedBox(
-                  width: 383,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_isAllChecked()) {
-                        Navigator.of(context)..pop()..pop();
-                        widget.showRescueBreathsDialogue();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isAllChecked() ? Color.fromARGB(255, 255, 68, 65) : Colors.grey,
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: Text(
-                        "Begin Guided Breaths",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  )
-              ),
-              SizedBox(height: 15),
-              SizedBox(
-                  width: 70,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white70,
-                      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 0, bottom: 0),
-                      child: Text(
-                        "Back",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  )
-              ),
-            ]
-          )
+            )
         ),
+      ),
+    );
+  }
+
+  Widget _buildChecklistRow(bool isChecked, String text, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: TextButton(
+          onPressed: onTap,
+          child: Row(
+              children: [
+                Icon(isChecked ? Icons.check_box : Icons.check_box_outline_blank, size: 25, color: Colors.red),
+                const SizedBox(width: 15),
+                Expanded(child: Text(text, style: const TextStyle(color: Colors.black))),
+              ]
+          )
       ),
     );
   }
@@ -1038,79 +846,59 @@ class RescueBreathsMenu extends StatelessWidget {
         elevation: 0,
         child:
         Column(
-            mainAxisSize: MainAxisSize.min, // Hugs the content tightly
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                   "Round ${roundNotifier.value - 1} Complete",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  )
+                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                   "30 compressions given. Now provide 2 breaths.",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  )
+                  style: TextStyle(fontSize: 14, color: Colors.white)
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               SizedBox(
-                width: 383,
-                child: ElevatedButton(
-                  onPressed: () {
-                    openBreathsChecklist();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 255, 68, 65),
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: Text(
-                      "Start Breaths (Recommended)",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                  width: 383,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        openBreathsChecklist();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                )
-              ),
-              SizedBox(height: 18),
-              SizedBox(
-                width: 383,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(0, 0, 0, 100),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    togglePause();
-                    Navigator.pop(context);
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: 5),
-                    child: Text(
-                      "Continue Hands-Only CPR",
-                      style: TextStyle(
-                        color: Colors.white,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                          "Start Breaths (Recommended)",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                          textAlign: TextAlign.center,
+                        ),
                       )
-                    ),
                   )
-                )
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                  width: 383,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(100, 0, 0, 0),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        togglePause();
+                        Navigator.pop(context);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: Text("Continue Hands-Only CPR", style: TextStyle(color: Colors.white)),
+                      )
+                  )
               )
             ]
         )
@@ -1197,7 +985,6 @@ class _StopCPRState extends State<StopCPR> {
   }
 
   void _notifyParent() {
-    // Uses the radio to send the true/false value up to the main page
     widget.onSelectionChanged(isSelected());
   }
 
@@ -1208,83 +995,48 @@ class _StopCPRState extends State<StopCPR> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Text(
+      const Text(
           "Stop CPR Checklist",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          )
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20)
       ),
-      Text(
+      const Text(
           "Only one of the options has to be checked.",
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 10,
-          )
+          style: TextStyle(color: Colors.grey, fontSize: 10)
       ),
-      SizedBox(height: 5),
+      const SizedBox(height: 5),
       TextButton(
           onPressed: button1,
           child: Row(children: [
-            Icon(
-              personRegainedConsciousness ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: Colors.red,
-              size: 25,
-            ),
-            SizedBox(width: 10),
-            Text(
-              "Person regained consciousness",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            )
+            Icon(personRegainedConsciousness ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: Colors.red, size: 25),
+            const SizedBox(width: 10),
+            Expanded(child: const Text("Person regained consciousness", style: TextStyle(fontSize: 16, color: Colors.black)))
           ])
       ),
-      SizedBox(height: 5),
+      const SizedBox(height: 5),
       TextButton(
           onPressed: button2,
           child: Row(children: [
-            Icon(
-              EMSArrivedAndTookOver ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: Colors.red,
-              size: 25,
-            ),
-            SizedBox(width: 10),
-            Text(
-              "EMS arrived and took over",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            )
+            Icon(EMSArrivedAndTookOver ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: Colors.red, size: 25),
+            const SizedBox(width: 10),
+            Expanded(child: const Text("EMS arrived and took over", style: TextStyle(fontSize: 16, color: Colors.black)))
           ])
       ),
-      SizedBox(height: 5,),
+      const SizedBox(height: 5,),
       TextButton(
           onPressed: button3,
           child: Row(children: [
-            Icon(
-              AEDInUseSwitchedCare ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: Colors.red,
-              size: 25,
-            ),
-            SizedBox(width: 10),
-            Text(
-              "AED in use / switched care",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            )
+            Icon(AEDInUseSwitchedCare ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: Colors.red, size: 25),
+            const SizedBox(width: 10),
+            Expanded(child: const Text("AED in use / switched care", style: TextStyle(fontSize: 16, color: Colors.black)))
           ])
       ),
-      SizedBox(height: 5,),
+      const SizedBox(height: 5,),
       TextButton(
           onPressed: button4,
           child: Row(children: [
-            Icon(
-              tooExhaustedToContinue ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: Colors.red,
-              size: 25,
-            ),
-            SizedBox(width: 10),
-            Text(
-              "Too exhausted to continue",
-              style: TextStyle(fontSize: 16, color: Colors.black),
-            )
+            Icon(tooExhaustedToContinue ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: Colors.red, size: 25),
+            const SizedBox(width: 10),
+            Expanded(child: const Text("Too exhausted to continue", style: TextStyle(fontSize: 16, color: Colors.black)))
           ])
       ),
     ]);
@@ -1295,86 +1047,41 @@ class _StopCPRState extends State<StopCPR> {
 // region MARK: CPR Instruction Text
 class CPRInstructionText extends StatelessWidget {
   final String currAge;
-  const CPRInstructionText({
-    super.key,
-    required this.currAge,
-  });
+  const CPRInstructionText({super.key, required this.currAge});
 
   @override
   Widget build(BuildContext context) {
-    String instructions_1 = "";
-    String instructions_2 = "";
-    String instructions_3 = "";
+    String instructions1 = "";
+    String instructions2 = "";
+    String instructions3 = "";
 
     if (currAge == "Adult") {
-      instructions_1 = "Tap & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
-      instructions_2 = "Hands only: heel of hand center of chest, other hand on top; arms straight. Push hard & fast (100-120/min), depth at least 2 in (5 cm). Allow full recoil.";
-      instructions_3 = "Minimize interruptions. Use an AED immediately when it arrives.";
+      instructions1 = "Tap & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
+      instructions2 = "Hands only: heel of hand center of chest, other hand on top; arms straight. Push hard & fast (100-120/min), depth at least 2 in (5 cm). Allow full recoil.";
+      instructions3 = "Minimize interruptions. Use an AED immediately when it arrives.";
     }
     else if (currAge == "Child") {
-      instructions_1 = "Tap & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
-      instructions_2 = "Use 1 or 2 hands on the center of the chest. Push hard & fast (100-120/min), depth about 2 in (5 cm). Allow full recoil.";
-      instructions_3 = "Minimize interruptions. Use an AED immediately (use child pads if available).";
+      instructions1 = "Tap & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
+      instructions2 = "Use 1 or 2 hands on the center of the chest. Push hard & fast (100-120/min), depth about 2 in (5 cm). Allow full recoil.";
+      instructions3 = "Minimize interruptions. Use an AED immediately (use child pads if available).";
     }
     else if (currAge == "Infant") {
-      instructions_1 = "Tap bottom of foot & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
-      instructions_2 = "Use 2 fingers in the center of the chest, just below the nipple line. Push hard & fast (100-120/min), depth about 1.5 in (4 cm). Allow full recoil.";
-      instructions_3 = "Minimize interruptions. Use an AED immediately (use infant pads if available).";
+      instructions1 = "Tap bottom of foot & shout. If unresponsive and not breathing normally, SEND someone to call 911 and bring an AED.";
+      instructions2 = "Use 2 fingers in the center of the chest, just below the nipple line. Push hard & fast (100-120/min), depth about 1.5 in (4 cm). Allow full recoil.";
+      instructions3 = "Minimize interruptions. Use an AED immediately (use infant pads if available).";
     }
     return Column(
       children: [
         Text(
           'How to perform CPR - $currAge',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 20),
-        Row(
-            children:[
-              Icon(
-                Icons.verified,
-                color: Colors.red, // Matches your image
-                size: 20.0,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  instructions_1,
-                ),
-              )
-            ]
-        ),
-        SizedBox(height: 20),
-        Row(
-            children:[
-              Icon(
-                Icons.verified,
-                color: Colors.red, // Matches your image
-                size: 20,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  instructions_2,
-                ),
-              )
-            ]
-        ),
-        SizedBox(height: 20),
-        Row(
-            children:[
-              Icon(
-                Icons.verified,
-                color: Colors.red, // Matches your image
-                size: 20.0,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  instructions_3,
-                ),
-              )
-            ]
-        ),
+        const SizedBox(height: 20),
+        Row(children:[const Icon(Icons.verified, color: Colors.red, size: 20.0), const SizedBox(width: 10), Expanded(child: Text(instructions1))]),
+        const SizedBox(height: 20),
+        Row(children:[const Icon(Icons.verified, color: Colors.red, size: 20), const SizedBox(width: 10), Expanded(child: Text(instructions2))]),
+        const SizedBox(height: 20),
+        Row(children:[const Icon(Icons.verified, color: Colors.red, size: 20.0), const SizedBox(width: 10), Expanded(child: Text(instructions3))]),
       ],
     );
   }
@@ -1384,36 +1091,22 @@ class CPRInstructionText extends StatelessWidget {
 // region MARK: Restart and Pause Buttons
 class RestartButton extends StatelessWidget {
   final VoidCallback reset;
-  const RestartButton({
-    super.key,
-    required this.reset,
-  });
+  const RestartButton({super.key, required this.reset});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: reset,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromARGB(255, 242, 232, 232),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        backgroundColor: const Color.fromARGB(255, 242, 232, 232),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      child: Row(
+      child: const Row(
         children: [
-          Icon(
-            Icons.restart_alt,
-            size: 18,
-            color: const Color.fromARGB(255, 0, 0, 0),
-          ),
+          Icon(Icons.restart_alt, size: 18, color: Color.fromARGB(255, 0, 0, 0)),
           SizedBox(width: 4),
-          Text(
-            "Reset",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: const Color.fromARGB(255, 0, 0, 0),
-            ),
-          ),
+          Text("Reset", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0))),
         ],
       ),
     );
@@ -1421,40 +1114,25 @@ class RestartButton extends StatelessWidget {
 }
 
 class PauseButton extends StatelessWidget {
-  final bool isCounting; // The information
-  final VoidCallback onToggle; // The remote control
+  final bool isCounting;
+  final VoidCallback onToggle;
 
-  const PauseButton({
-    super.key,
-    required this.isCounting,
-    required this.onToggle
-  });
+  const PauseButton({super.key, required this.isCounting, required this.onToggle});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onToggle, // When pressed, use the remote control!
+      onPressed: onToggle,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromARGB(255, 242, 232, 232),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        backgroundColor: const Color.fromARGB(255, 242, 232, 232),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Row(
         children: [
-          Icon(
-            isCounting ? Icons.pause : Icons.play_arrow,
-            size: 22,
-            color: const Color.fromARGB(255, 0, 0, 0),
-          ),
-          SizedBox(width: 10),
-          Text(
-            isCounting ? 'Pause' : 'Resume',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: const Color.fromARGB(255, 0, 0, 0),
-            ),
-          ),
+          Icon(isCounting ? Icons.pause : Icons.play_arrow, size: 22, color: const Color.fromARGB(255, 0, 0, 0)),
+          const SizedBox(width: 10),
+          Text(isCounting ? 'Pause' : 'Resume', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0))),
         ],
       ),
     );
@@ -1488,31 +1166,18 @@ class Call911Button extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color.fromARGB(255, 255, 68, 65),
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          backgroundColor: const Color.fromARGB(255, 255, 68, 65),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        child: Row(
-          // mainAxisSize: MainAxisSize.min,
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Icon(Icons.phone, size: 30, color: Colors.white),
             SizedBox(width: 20),
-            Text(
-              'Call 911',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text('Call 911', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
             SizedBox(width: 20),
-            Text(
-              "(If anyone else isn't available)",
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
+            Expanded(child: Text("(If anyone else isn't available)", style: TextStyle(fontSize: 12, color: Colors.white))),
           ],
         ),
       ),

@@ -1,20 +1,13 @@
 import 'dart:ui';
 
-import 'package:english_words/english_words.dart';
-import 'package:english_words/src/word_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'main.dart';
-import 'homepage.dart';
-import 'select_age.dart';
-import 'cprConfirmation.dart';
-import 'package:flutter/material.dart';
 import 'cprPage.dart';
 
 class CPRChecklist extends StatefulWidget {
   @override
-  // ignore: library_private_types_in_public_api
   _CPRChecklistState createState() => _CPRChecklistState();
 }
 
@@ -46,114 +39,79 @@ class _CPRChecklistState extends State<CPRChecklist> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('CPR Checklist')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      appBar: AppBar(title: const Text('CPR Checklist')),
+      // The LayoutBuilder trick ensures Spacers work perfectly on any screen size!
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
+                      Text(
+                        appState.currentAge,
+                        style: const TextStyle(
+                          fontSize: 42.0,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 253, 75, 75),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const FirstBox(),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Pre-CPR Checklist',
+                        style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Checkboxes
+                      _buildChecklistItem(0),
+                      _buildChecklistItem(1),
+                      _buildChecklistItem(2),
+
+                      const Spacer(), // Replaces the giant 210 SizedBox safely!
+
+                      StartCPRButton(checklist: pre_cpr_checklist),
+
+                      const SizedBox(height: 50), // Safe bottom padding
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChecklistItem(int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          pre_cpr_checklist[index] = !pre_cpr_checklist[index];
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10.0),
+        child: Row(
           children: [
-            Text(
-              appState.currentAge,
-              style: TextStyle(
-                fontSize: 42.0,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 253, 75, 75),
+            Icon(
+                pre_cpr_checklist[index] ? Icons.check_box : Icons.check_box_outline_blank,
+                color: const Color(0xFFE53935)
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                checklist[index],
+                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
               ),
             ),
-            SizedBox(height: 24),
-            FirstBox(),
-            SizedBox(height: 24),
-            Text(
-              'Pre-CPR Checklist',
-              style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  pre_cpr_checklist[0] = !pre_cpr_checklist[0];
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    FirstCheckBox(isChecked: pre_cpr_checklist[0]),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        checklist[0],
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  pre_cpr_checklist[1] = !pre_cpr_checklist[1];
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    FirstCheckBox(isChecked: pre_cpr_checklist[1]),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        checklist[1],
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  pre_cpr_checklist[2] = !pre_cpr_checklist[2];
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  children: [
-                    FirstCheckBox(isChecked: pre_cpr_checklist[2]),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        checklist[2],
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 210),
-            StartCPRButton(checklist: pre_cpr_checklist),
-            SizedBox(height: 90),
           ],
         ),
       ),
@@ -161,93 +119,33 @@ class _CPRChecklistState extends State<CPRChecklist> {
   }
 }
 
-class StartCPRButton extends StatefulWidget {
+class StartCPRButton extends StatelessWidget {
   final List<bool> checklist;
   const StartCPRButton({super.key, required this.checklist});
 
   @override
-  State<StartCPRButton> createState() => _StartCPRButtonState();
-}
-
-class _StartCPRButtonState extends State<StartCPRButton> {
-  @override
   Widget build(BuildContext context) {
-    bool allChecked = true;
-    for (int i = 0; i < 3; i++) {
-      if (!widget.checklist[i]) {
-        allChecked = false;
-      }
-    }
-    if (allChecked) {
-      return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Color.fromARGB(255, 255, 70, 67),
-          foregroundColor: Colors.white,
+    bool allChecked = !checklist.contains(false); // Clean trick to check all bools!
 
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CPRPage()),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 96.0, vertical: 12.0),
-          child: Text(
-            'Begin CPR',
-            style: TextStyle(
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 255, 255, 255),
-            ),
-          ),
-        ),
-      );
-    }
     return ElevatedButton(
-      onPressed: null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.grey,
+        backgroundColor: allChecked ? const Color.fromARGB(255, 255, 70, 67) : Colors.grey,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 96.0, vertical: 12.0),
-        child: Text(
-          'Begin CPR',
-          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-        ),
+      onPressed: allChecked ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CPRPage()),
+        );
+      } : null,
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 96.0, vertical: 12.0),
+        child: Text('Begin CPR', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
       ),
     );
-  }
-}
-
-class FirstCheckBox extends StatefulWidget {
-  final bool isChecked;
-  const FirstCheckBox({super.key, required this.isChecked});
-
-  @override
-  State<FirstCheckBox> createState() => _FirstCheckBoxState();
-}
-
-class _FirstCheckBoxState extends State<FirstCheckBox> {
-  @override
-  Widget build(BuildContext context) {
-    bool all = true;
-    for (int i = 0; i < 3; i++) {
-      if (!widget.isChecked) {
-        all = false;
-      }
-    }
-    if (widget.isChecked) {
-      return Icon(Icons.check_box, color: Color(0xFFE53935));
-    }
-    return Icon(Icons.check_box_outline_blank, color: Color(0xFFE53935));
   }
 }
 
@@ -257,55 +155,40 @@ class FirstBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PhysicalModel(
-      // This is the background color of the box
       color: const Color.fromARGB(255, 255, 210, 210),
-      // Elevation adds the shadow automatically
       elevation: 5,
       shadowColor: Colors.black.withOpacity(0.2),
-      // This is what rounds the corners of the PhysicalModel itself
       borderRadius: BorderRadius.circular(25),
-      // This forces the children (the Rows/Text) to be clipped to the rounded shape
       clipBehavior: Clip.antiAlias,
       child: Container(
         width: 300,
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
-        child: Column(
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Row 1: 911 Instruction
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.phone, size: 18.0, color: Color(0xFFE53935)),
-                const SizedBox(width: 12.0),
-                const Text(
-                  'Ensure someone is calling 911',
-                  style: TextStyle(
-                    fontSize: 13.0,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFE53935),
+                Icon(Icons.phone, size: 18.0, color: Color(0xFFE53935)),
+                SizedBox(width: 12.0),
+                Expanded(
+                  child: Text(
+                    'Ensure someone is calling 911',
+                    style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600, color: Color(0xFFE53935)),
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 10), // Spacing between the two rows
-            // Row 2: AED Instruction
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.favorite,
-                  size: 18.0,
-                  color: Color(0xFFE53935),
-                ),
-                const SizedBox(width: 12.0),
-                const Text(
-                  'Ensure someone is getting an AED',
-                  style: TextStyle(
-                    fontSize: 13.0,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFE53935),
+                Icon(Icons.favorite, size: 18.0, color: Color(0xFFE53935)),
+                SizedBox(width: 12.0),
+                Expanded(
+                  child: Text(
+                    'Ensure someone is getting an AED',
+                    style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w600, color: Color(0xFFE53935)),
                   ),
                 ),
               ],
