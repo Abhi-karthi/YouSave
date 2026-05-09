@@ -276,7 +276,7 @@ class _CPRPageState extends State<CPRPage> {
         children: [
           Center(child: Call911Button(togglePause: _togglePause, isCounting: counting, appState: appState)),
 
-          Spacer(flex: 2),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
           ExcludeSemantics(
             child: SizedBox(
@@ -294,11 +294,10 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          Spacer(flex: 2),
+          // SizedBox(height: MediaQuery.of(context).size.height * 0.00),
 
           ExcludeSemantics(
             child: SizedBox(
-              height: 90,
               child: ValueListenableBuilder<int>(
                 valueListenable: beatsNotifier,
                 builder: (context, beats, child) {
@@ -315,7 +314,7 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          Spacer(flex: 2),
+          // SizedBox(height: MediaQuery.of(context).size.height * 0.01),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -330,12 +329,13 @@ class _CPRPageState extends State<CPRPage> {
               ),
             ],
           ),
-          Spacer(flex: 1),
+
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
           Center(
             child: RepaintBoundary(
               child: Container(
-                  width: 350,
+                  width: MediaQuery.of(context).size.width * 0.8,
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
@@ -354,12 +354,12 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          Spacer(flex: 2),
+          // SizedBox(height: MediaQuery.of(context).size.height * 0.005),
 
           Center(
             child: RepaintBoundary(
               child: Container(
-                  width: 350,
+                  width: MediaQuery.of(context).size.width * 0.8,
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.symmetric(vertical: 40),
                   decoration: BoxDecoration(
@@ -385,11 +385,11 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          Spacer(flex: 2),
+          // SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
           Center(
             child: SizedBox(
-              width: 383,
+              width: MediaQuery.of(context).size.width * 0.82,
               child: ElevatedButton(
                   onPressed: isDoneActive ? () {
                     print('Stop CPR NOW');
@@ -499,7 +499,7 @@ class _CPRReportState extends State<CPRReport> {
           ),
           const SizedBox(height: 40),
           Container(
-              width: 330,
+              width: MediaQuery.of(context).size.width * 0.8,
               padding: const EdgeInsets.all(15), // Let the container hug the text naturally
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
@@ -523,7 +523,7 @@ class _CPRReportState extends State<CPRReport> {
           ),
           const SizedBox(height: 20),
           SizedBox(
-            width: 330,
+            width: MediaQuery.of(context).size.width * 0.8,
             child: ElevatedButton(
                 onPressed: () async {
                   await Clipboard.setData(ClipboardData(text: "CPR Incident Report - CPR Start Time: $time, Age Group of Victim: $age, Total Rounds Completed: $rounds, Total Compressions: $totalCompressions, Reason for stopping CPR: $reasonForStopping"));
@@ -552,9 +552,6 @@ class _CPRReportState extends State<CPRReport> {
 }
 
 // endregion
-
-// ---> THE UI DIALOG FIXES <---
-// Removed all giant SizedBoxes and used mainAxisSize: MainAxisSize.min to instantly center!
 
 // region MARK: Second Breath Starter
 class SecondBreathStarter extends StatelessWidget {
@@ -1173,20 +1170,18 @@ class Call911Button extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color.fromARGB(255, 255, 68, 65),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        child: Expanded(
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(Icons.phone, size: 30, color: Colors.white),
-              Spacer(),
-              Text('Call 911', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
-              Spacer(),
-              Text("(If anyone else isn't available)", style: TextStyle(fontSize: 12, color: Colors.white)),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(Icons.phone, size: 30, color: Colors.white),
+            SizedBox(width: MediaQuery.of(context).size.width*0.07),
+            Text('Call 911', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+            SizedBox(width: MediaQuery.of(context).size.width*0.07),
+            Expanded(child: Text("(If anyone else isn't available)", style: TextStyle(fontSize: 12, color: Colors.white))),
+          ],
         ),
       ),
     );

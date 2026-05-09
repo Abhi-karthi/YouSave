@@ -40,51 +40,46 @@ class _CPRChecklistState extends State<CPRChecklist> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('CPR Checklist')),
-      // The LayoutBuilder trick ensures Spacers work perfectly on any screen size!
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 20),
-                      Text(
-                        appState.currentAge,
-                        style: const TextStyle(
-                          fontSize: 42.0,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 253, 75, 75),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const FirstBox(),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Pre-CPR Checklist',
-                        style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Checkboxes
-                      _buildChecklistItem(0),
-                      _buildChecklistItem(1),
-                      _buildChecklistItem(2),
-
-                      const Spacer(), // Replaces the giant 210 SizedBox safely!
-
-                      StartCPRButton(checklist: pre_cpr_checklist),
-
-                      const SizedBox(height: 50), // Safe bottom padding
-                    ],
-                  ),
+        bottom: false,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                appState.currentAge,
+                style: const TextStyle(
+                  fontSize: 42.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 253, 75, 75),
                 ),
               ),
-            );
-          },
+              const SizedBox(height: 24),
+              const FirstBox(),
+              const SizedBox(height: 24),
+              const Text(
+                'Pre-CPR Checklist',
+                style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+
+              // Checkboxes
+              _buildChecklistItem(0),
+              _buildChecklistItem(1),
+              _buildChecklistItem(2),
+
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+      // Pinned to the bottom on every screen size — no overflow possible! 🎯
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: StartCPRButton(checklist: pre_cpr_checklist),
         ),
       ),
     );

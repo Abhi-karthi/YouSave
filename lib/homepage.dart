@@ -90,14 +90,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.favorite,
-                            color: Color.fromARGB(255, 239, 59, 59),
-                            size: 350,
+                            color: const Color.fromARGB(255, 239, 59, 59),
+                            size: MediaQuery.of(context).size.width * 0.7,
                           ),
                           SizedBox(
-                            width: 93,
-                            height: 170,
+                            width: MediaQuery.of(context).size.width * 0.22,  // Roughly equivalent to 93
+                            height: MediaQuery.of(context).size.width * 0.38,
                             child: CustomPaint(painter: ECGLinesPainter()),
                           ),
                         ],

@@ -13,28 +13,39 @@ class SelectAgePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Age Selection')),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Spacer(flex: 1), // Adds flexible top padding
-            Text(
-              "Select Age:",
-              style: TextStyle(
-                color: Color.fromARGB(255, 255, 61, 61),
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: const IntrinsicHeight(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 24),
+                      Text(
+                        "Select Age:",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 255, 61, 61),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                        ),
+                      ),
+                      SizedBox(height: 40),
+                      AdultElevatedButton(),
+                      SizedBox(height: 24),
+                      ChildElevatedButton(),
+                      SizedBox(height: 24),
+                      InfantElevatedButton(),
+                      SizedBox(height: 40),
+                    ],
+                  ),
+                ),
               ),
             ),
-            Spacer(flex: 4),
-            AdultElevatedButton(),
-            Spacer(flex: 2),
-            ChildElevatedButton(),
-            Spacer(flex: 2),
-            InfantElevatedButton(),
-            Spacer(flex: 5), // Adds flexible bottom padding
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -62,6 +73,7 @@ class AdultElevatedButton extends StatelessWidget {
       child: const Padding(
         padding: EdgeInsets.all(50.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Adult', style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -96,6 +108,7 @@ class ChildElevatedButton extends StatelessWidget {
       child: const Padding(
         padding: EdgeInsets.all(50.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Child', style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -130,6 +143,7 @@ class InfantElevatedButton extends StatelessWidget {
       child: const Padding(
         padding: EdgeInsets.all(50.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Infant', style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
