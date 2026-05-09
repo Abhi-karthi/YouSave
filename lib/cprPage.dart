@@ -276,7 +276,7 @@ class _CPRPageState extends State<CPRPage> {
         children: [
           Center(child: Call911Button(togglePause: _togglePause, isCounting: counting, appState: appState)),
 
-          const SizedBox(height: 20),
+          Spacer(flex: 2),
 
           ExcludeSemantics(
             child: SizedBox(
@@ -293,6 +293,8 @@ class _CPRPageState extends State<CPRPage> {
               ),
             ),
           ),
+
+          Spacer(flex: 2),
 
           ExcludeSemantics(
             child: SizedBox(
@@ -313,7 +315,7 @@ class _CPRPageState extends State<CPRPage> {
             ),
           ),
 
-          SizedBox(height: MediaQuery.of(context).size.height*0.05),
+          Spacer(flex: 2),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -328,7 +330,7 @@ class _CPRPageState extends State<CPRPage> {
               ),
             ],
           ),
-          const SizedBox(height: 15),
+          Spacer(flex: 1),
 
           Center(
             child: RepaintBoundary(
@@ -351,6 +353,8 @@ class _CPRPageState extends State<CPRPage> {
                   child: CPRInstructionText(currAge: currAge)),
             ),
           ),
+
+          Spacer(flex: 2),
 
           Center(
             child: RepaintBoundary(
@@ -380,6 +384,8 @@ class _CPRPageState extends State<CPRPage> {
                   )),
             ),
           ),
+
+          Spacer(flex: 2),
 
           Center(
             child: SizedBox(
@@ -1151,7 +1157,7 @@ class Call911Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 383,
+      width: MediaQuery.of(context).size.width * 0.84,
       child: ElevatedButton(
         onPressed: () {
           print('Call 911 pressed');
@@ -1170,15 +1176,17 @@ class Call911Button extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Icon(Icons.phone, size: 30, color: Colors.white),
-            SizedBox(width: 20),
-            Text('Call 911', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
-            SizedBox(width: 20),
-            Expanded(child: Text("(If anyone else isn't available)", style: TextStyle(fontSize: 12, color: Colors.white))),
-          ],
+        child: Expanded(
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.phone, size: 30, color: Colors.white),
+              Spacer(),
+              Text('Call 911', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Spacer(),
+              Text("(If anyone else isn't available)", style: TextStyle(fontSize: 12, color: Colors.white)),
+            ],
+          ),
         ),
       ),
     );

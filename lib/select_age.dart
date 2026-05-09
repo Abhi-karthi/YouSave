@@ -17,7 +17,7 @@ class SelectAgePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Spacer(flex: 2), // Adds flexible top padding
+            Spacer(flex: 1), // Adds flexible top padding
             Text(
               "Select Age:",
               style: TextStyle(
@@ -26,13 +26,13 @@ class SelectAgePage extends StatelessWidget {
                 fontSize: 30,
               ),
             ),
-            Spacer(flex: 1),
+            Spacer(flex: 4),
             AdultElevatedButton(),
-            Spacer(flex: 1),
+            Spacer(flex: 2),
             ChildElevatedButton(),
-            Spacer(flex: 1),
+            Spacer(flex: 2),
             InfantElevatedButton(),
-            Spacer(flex: 2), // Adds flexible bottom padding
+            Spacer(flex: 5), // Adds flexible bottom padding
           ],
         ),
       ),

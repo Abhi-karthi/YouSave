@@ -19,7 +19,7 @@ class CPRConfirmationPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Spacer(flex: 2), // Flexible padding!
+            const Spacer(flex: 1), // Flexible padding!
             Text(
               appState.currentAge,
               style: const TextStyle(
@@ -28,11 +28,11 @@ class CPRConfirmationPage extends StatelessWidget {
                 color: Color.fromARGB(255, 253, 75, 75),
               ),
             ),
-            const Spacer(flex: 3),
+            const Spacer(flex: 5),
             Call911(appState: appState),
             const SizedBox(height: 30), // Keeps the two buttons locked near each other
             StartCPR(appState: appState),
-            const Spacer(flex: 4),
+            const Spacer(flex: 5),
           ],
         ),
       ),
@@ -47,25 +47,28 @@ class StartCPR extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CPRChecklist()),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 255, 61, 61),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.84,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CPRChecklist()),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 255, 61, 61),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
         ),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 93.0, vertical: 20.0),
-        child: Text(
-          'Start CPR',
-          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 20.0),
+          child: Text(
+            'Start CPR',
+            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -79,31 +82,33 @@ class Call911 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Call911Page(appState: appState),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.84,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Call911Page(appState: appState),
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 255, 61, 61),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
           ),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 255, 61, 61),
-        foregroundColor: Colors.white,
-        fixedSize: const Size(350, 115),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
         ),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(14.0),
-        child: Column(
-          children: [
-            Text('Call 911', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
-            Text('If you are alone, call now. Otherwise, tell someone else to.', style: TextStyle(fontSize: 12.0)),
-          ],
+        child: const Padding(
+          padding: EdgeInsets.all(14.0),
+          child: Column(
+            children: [
+              Text('Call 911', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+              SizedBox(height: 5),
+              Text('If you are alone, call now. Otherwise, tell someone else to.', style: TextStyle(fontSize: 12.0)),
+            ],
+          ),
         ),
       ),
     );

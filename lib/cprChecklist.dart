@@ -127,23 +127,26 @@ class StartCPRButton extends StatelessWidget {
   Widget build(BuildContext context) {
     bool allChecked = !checklist.contains(false); // Clean trick to check all bools!
 
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: allChecked ? const Color.fromARGB(255, 255, 70, 67) : Colors.grey,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.84,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: allChecked ? const Color.fromARGB(255, 255, 70, 67) : Colors.grey,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
         ),
-      ),
-      onPressed: allChecked ? () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CPRPage()),
-        );
-      } : null,
-      child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 96.0, vertical: 12.0),
-        child: Text('Begin CPR', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+        onPressed: allChecked ? () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CPRPage()),
+          );
+        } : null,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.0),
+          child: Text('Begin CPR', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+        ),
       ),
     );
   }
@@ -161,8 +164,8 @@ class FirstBox extends StatelessWidget {
       borderRadius: BorderRadius.circular(25),
       clipBehavior: Clip.antiAlias,
       child: Container(
-        width: 300,
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
+        width: MediaQuery.of(context).size.width * 0.7,
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 23.0),
         child: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
